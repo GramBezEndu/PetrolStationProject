@@ -12,15 +12,15 @@ namespace PetrolStation.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdFueling { get; set; }
-        [Required]
-        public float Quantity { get; set; }
-        [Required]
-        public DateTime Date { get; set; }
         public Fuel Fuel { get; set; }
         [ForeignKey("Fuel")]
         public int IdFuel { get; set; }
         public GasPump GasPump { get; set; }
         [ForeignKey("GasPump")]
         public int IdGasPump { get; set; }
+        [Required]
+        public float Quantity { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
     }
 }

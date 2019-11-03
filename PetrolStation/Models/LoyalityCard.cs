@@ -12,5 +12,10 @@ namespace PetrolStation.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdLoyalityCard { get; set; }
+        public Client Client { get; set; }
+        [ForeignKey("Client")]
+        public int IdClient { get; set; }
+        [Required]
+        public int ActualPoints { get; set; }
     }
 }

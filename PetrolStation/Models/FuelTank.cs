@@ -12,12 +12,12 @@ namespace PetrolStation.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdFuelTank { get; set; }
+        public Fuel Fuel { get; set; }
+        [ForeignKey("Fuel")]
+        public int IdFuel { get; set; }
         [Required]
         public float Capacity { get; set; }
         [Required]
         public float ActualQuantity { get; set; }
-        public Fuel Fuel { get; set; }
-        [ForeignKey("Fuel")]
-        public int IdFuel { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PetrolStation.Models
 {
-    public abstract class Transaction
+    public class Transaction
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,6 +15,8 @@ namespace PetrolStation.Models
         public LoyalityCard? LoyalityCard { get; set; }
         [ForeignKey("LoyalityCard")]
         public virtual int IdLoyalityCard { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
 
     }
 }

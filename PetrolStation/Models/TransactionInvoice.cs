@@ -11,7 +11,6 @@ namespace PetrolStation.Models
         public Client Client { get; set; }
         [ForeignKey("Client")]
         public int IdClient { get; set; }
-        public DateTime Date { get; set; }
         public Car Car { get; set; }
         [ForeignKey("Car")]
         public int IdCar { get; set; }

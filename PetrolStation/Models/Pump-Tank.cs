@@ -11,10 +11,12 @@ namespace PetrolStation.Models
     {
         public GasPump GasPump { get; set; }
         [Key]
+        [Column(Order = 1)]
         [ForeignKey("GasPump")]
         public int IdGasPump { get; set; }
         public FuelTank FuelTank { get; set; }
         [Key]
+        [Column(Order = 2)]
         [ForeignKey("FuelTank")]
         public int IdFuelTank { get; set; }
     }

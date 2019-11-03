@@ -7,20 +7,17 @@ using System.Threading.Tasks;
 
 namespace PetrolStation.Models
 {
-    public class ProductList
+    public class FuelingList
     {
         public Transaction Transaction { get; set; }
         [Key]
         [Column(Order = 1)]
         [ForeignKey("Transaction")]
         public int IdTransaction { get; set; }
-        public Product Product { get; set; }
+        public Fueling Fueling { get; set; }
         [Key]
         [Column(Order = 2)]
-        [ForeignKey("Product")]
-        public int IdProduct { get; set; }
-        [Required]
-        public int Quantity { get; set; }
-
+        [ForeignKey("Fueling")]
+        public int IdFueling { get; set; }
     }
 }

@@ -10,9 +10,9 @@ namespace PetrolStation.Models
     {
         public Client Client { get; set; }
         [ForeignKey("Client")]
-        public int IdClient { get; set; }
+        public int? IdClient { get; set; }
         public Car Car { get; set; }
         [ForeignKey("Car")]
-        public int IdCar { get; set; }
+        public int? IdCar { get; set; }
     }
 }

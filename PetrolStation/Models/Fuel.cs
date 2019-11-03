@@ -7,18 +7,14 @@ using System.Threading.Tasks;
 
 namespace PetrolStation.Models
 {
-    public class Product
+    public class Fuel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdProduct { get; set; }
+        public int IdFuel { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
-        public int QuantityInStorage { get; set; }
-        [Required]
-        public decimal Price { get; set; }
-        [Required]
-        public int PriceInPoints { get; set; }
+        public decimal PriceForLiter { get; set; }
     }
 }

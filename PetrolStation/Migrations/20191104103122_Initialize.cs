@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PetrolStation.Migrations
 {
-    public partial class PetrolStationMigration : Migration
+    public partial class Initialize : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

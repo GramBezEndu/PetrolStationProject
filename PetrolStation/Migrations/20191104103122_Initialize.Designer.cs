@@ -10,8 +10,8 @@ using PetrolStation.Models;
 namespace PetrolStation.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20191103202932_PetrolStationMigration")]
-    partial class PetrolStationMigration
+    [Migration("20191104103122_Initialize")]
+    partial class Initialize
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -23,7 +23,7 @@ namespace PetrolStation.Models
             if (!optionsBuilder.IsConfigured)
             {
 
-                optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                optionsBuilder.UseSqlServer(@"Data Source=den1.mssql7.gear.host;User ID=petrolstationdb;Password=Iu24_t!bgs41;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
             }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

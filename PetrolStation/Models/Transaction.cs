@@ -12,9 +12,9 @@ namespace PetrolStation.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdTransaction { get; set; }
-        public LoyalityCard? LoyalityCard { get; set; }
+        public LoyalityCard LoyalityCard { get; set; }
         [ForeignKey("LoyalityCard")]
-        public virtual int IdLoyalityCard { get; set; }
+        public virtual int? IdLoyalityCard { get; set; }
         [Required]
         public DateTime Date { get; set; }
 

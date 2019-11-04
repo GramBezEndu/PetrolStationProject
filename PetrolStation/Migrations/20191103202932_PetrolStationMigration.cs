@@ -18,8 +18,8 @@ namespace PetrolStation.Migrations
                     Surname = table.Column<string>(nullable: true),
                     NIP = table.Column<string>(nullable: true),
                     Street = table.Column<string>(nullable: false),
-                    HouseNumber = table.Column<int>(nullable: false),
-                    ApartmentNumber = table.Column<int>(nullable: false),
+                    HouseNumber = table.Column<string>(nullable: false),
+                    ApartmentNumber = table.Column<int>(nullable: true),
                     Postcode = table.Column<string>(nullable: false),
                     Locality = table.Column<string>(nullable: false)
                 },
@@ -168,7 +168,7 @@ namespace PetrolStation.Migrations
                 {
                     IdTransaction = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdLoyalityCard = table.Column<int>(nullable: false),
+                    IdLoyalityCard = table.Column<int>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false),
                     Discriminator = table.Column<string>(nullable: false),
                     IdClient = table.Column<int>(nullable: true),
@@ -182,7 +182,7 @@ namespace PetrolStation.Migrations
                         column: x => x.IdLoyalityCard,
                         principalTable: "LoyalityCard",
                         principalColumn: "IdLoyalityCard",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Transaction_Car_IdCar",
                         column: x => x.IdCar,

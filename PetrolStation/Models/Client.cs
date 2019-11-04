@@ -19,8 +19,8 @@ namespace PetrolStation.Models
         [Required]
         public string Street { get; set; }
         [Required]
-        public int HouseNumber { get; set; }
-        public int ApartmentNumber { get; set; }
+        public string HouseNumber { get; set; }
+        public int? ApartmentNumber { get; set; }
         [Required]
         public string Postcode { get; set; }
         [Required]

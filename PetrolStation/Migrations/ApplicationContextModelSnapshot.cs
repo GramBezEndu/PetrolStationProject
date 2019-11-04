@@ -53,14 +53,15 @@ namespace PetrolStation.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ApartmentNumber")
+                    b.Property<int?>("ApartmentNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("HouseNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Locality")
                         .IsRequired()
@@ -280,7 +281,7 @@ namespace PetrolStation.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("IdLoyalityCard")
+                    b.Property<int?>("IdLoyalityCard")
                         .HasColumnType("int");
 
                     b.HasKey("IdTransaction");
@@ -400,9 +401,7 @@ namespace PetrolStation.Migrations
                 {
                     b.HasOne("PetrolStation.Models.LoyalityCard", "LoyalityCard")
                         .WithMany()
-                        .HasForeignKey("IdLoyalityCard")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IdLoyalityCard");
                 });
 
             modelBuilder.Entity("PetrolStation.Models.TransactionInvoice", b =>

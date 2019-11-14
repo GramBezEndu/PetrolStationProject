@@ -1,0 +1,53 @@
+﻿@model IEnumerable<PetrolStation.Models.Product>
+
+@{
+    ViewData["Title"] = "ViewProductList";
+}
+
+<h1>ViewProductList</h1>
+
+<p>
+    <a asp-action="AddProductForm">Add new product</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantityInStorage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PriceInPoints)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantityInStorage)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PriceInPoints)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdProduct">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdProduct">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdProduct">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

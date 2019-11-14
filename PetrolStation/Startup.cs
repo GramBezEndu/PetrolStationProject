@@ -12,6 +12,7 @@ using PetrolStation.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using PetrolStation.Models;
 
 namespace PetrolStation
 {
@@ -32,6 +33,7 @@ namespace PetrolStation
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddScoped<ApplicationContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

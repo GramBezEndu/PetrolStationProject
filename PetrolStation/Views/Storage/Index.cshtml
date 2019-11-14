@@ -1,0 +1,14 @@
+﻿@model Product
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>Successfully added product</h1>
+<p>Name: @Model.Name</p>
+<p>Price: @Model.Price</p>
+<p>Price in points: @Model.PriceInPoints</p>
+<p>Quantity in storage: @Model.QuantityInStorage</p>
+<a asp-action="AddProductForm">Add another product</a>
+<br />
+<a asp-controller="Home" asp-action="Index">Back to main page</a>

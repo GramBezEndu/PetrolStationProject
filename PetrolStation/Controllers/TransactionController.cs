@@ -61,11 +61,7 @@ namespace PetrolStation.Controllers
         {
             var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
             ProductQuantity productQuantity = new ProductQuantity();
-            productQuantity.product.IdProduct = szukanyProdukt[0].IdProduct;
-            productQuantity.product.Name = szukanyProdukt[0].Name;
-            productQuantity.product.Price = szukanyProdukt[0].Price;
-            productQuantity.product.PriceInPoints = szukanyProdukt[0].PriceInPoints;
-            productQuantity.product.QuantityInStorage = szukanyProdukt[0].QuantityInStorage;
+            productQuantity.product = szukanyProdukt[0];
             productQuantity.Quantity = transactionModel.QuantityPurchasedProduct;
             transactionModel.purchasedProducts.Add(productQuantity);
             foreach (var item in transactionModel.purchasedProducts)
@@ -78,7 +74,6 @@ namespace PetrolStation.Controllers
         public IActionResult AddProductWyswietl()
         {
             var transactionModel = TempData.Get<TransactionModel>("key");
-            int a = 2;
             ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
             return View("AddTransaction", transactionModel);
         }

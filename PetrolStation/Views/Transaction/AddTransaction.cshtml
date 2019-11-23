@@ -1,0 +1,74 @@
+﻿@model PetrolStation.Models.ModelePomocnicze.TransactionModel
+
+@{
+    ViewData["Title"] = "AddTransaction";
+}
+
+<h1>AddTransaction</h1>
+
+<h4>Transaction</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddProduct">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <!--
+    kod
+    -->
+            @if (Model.purchasedProducts.Count != 0)
+            {
+                for (var i = 0; i < Model.purchasedProducts.Count; i++)
+                {
+                    <input asp-for=">@Model.purchasedProducts[i].product.Name" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].product.IdProduct" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].product.Price" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].product.PriceInPoints" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].product.QuantityInStorage" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].Quantity" hidden  />
+                }
+            }
+
+            <table>
+                <tr>
+                    <th>Nazwa produktu</th>
+                    <th>Cena produktu</th>
+                    <th>Ilość</th>
+                    <th>Cena brutto</th>
+                </tr>
+                @if (Model.purchasedProducts.Count != 0)
+                {
+                    for (var i = 0; i < Model.purchasedProducts.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.purchasedProducts[i].product.Name</td>
+                            <td>@Model.purchasedProducts[i].product.Price</td>
+                            <td>@Model.purchasedProducts[i].Quantity</td>
+                            <td>@(Model.purchasedProducts[i].Quantity*Model.purchasedProducts[i].product.Price)</td>
+                        </tr>
+                    }
+                }
+            </table>
+            <br />
+            <div class="form-group">
+                <label asp-for="NamePurchasedProduct" class="control-label">Nazwa produktu</label>
+                <select asp-for="NamePurchasedProduct" class="form-control" asp-items="ViewBag.Produkty"></select>
+            </div>
+            <label asp-for="QuantityPurchasedProduct" class="control-label">Ilość produktu</label>
+            <input asp-for="QuantityPurchasedProduct" />
+            <label asp-for="TransactionValue" class="control-label">Wartość transakcji</label>
+            <input asp-for="@Model.TransactionValue" disabled />
+            <div class="form-group">
+                <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

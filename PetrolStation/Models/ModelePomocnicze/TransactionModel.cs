@@ -11,5 +11,8 @@ namespace PetrolStation.Models.ModelePomocnicze
         public string NamePurchasedProduct { get; set; }
         public int QuantityPurchasedProduct { get; set; }
         public decimal TransactionValue { get; set; }
+        public bool IsInvoice { get; set; }
+        public int IdLoyalityCard { get; set; }
+        public Client client { get; set; } = new Client();
     }
 }

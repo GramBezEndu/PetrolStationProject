@@ -19,14 +19,15 @@
             {
                 for (var i = 0; i < Model.purchasedProducts.Count; i++)
                 {
-                    <input asp-for=">@Model.purchasedProducts[i].product.Name" hidden  />
-                    <input asp-for=">@Model.purchasedProducts[i].product.IdProduct" hidden  />
-                    <input asp-for=">@Model.purchasedProducts[i].product.Price" hidden  />
-                    <input asp-for=">@Model.purchasedProducts[i].product.PriceInPoints" hidden  />
-                    <input asp-for=">@Model.purchasedProducts[i].product.QuantityInStorage" hidden  />
-                    <input asp-for=">@Model.purchasedProducts[i].Quantity" hidden  />
+                    <input asp-for=">@Model.purchasedProducts[i].product.Name" hidden />
+                    <input asp-for=">@Model.purchasedProducts[i].product.IdProduct" hidden />
+                    <input asp-for=">@Model.purchasedProducts[i].product.Price" hidden />
+                    <input asp-for=">@Model.purchasedProducts[i].product.PriceInPoints" hidden />
+                    <input asp-for=">@Model.purchasedProducts[i].product.QuantityInStorage" hidden />
+                    <input asp-for=">@Model.purchasedProducts[i].Quantity" hidden />
                 }
             }
+            <input asp-for="@Model.IsInvoice" hidden />
 
             <table>
                 <tr>
@@ -43,7 +44,7 @@
                             <td>@Model.purchasedProducts[i].product.Name</td>
                             <td>@Model.purchasedProducts[i].product.Price</td>
                             <td>@Model.purchasedProducts[i].Quantity</td>
-                            <td>@(Model.purchasedProducts[i].Quantity*Model.purchasedProducts[i].product.Price)</td>
+                            <td>@(Model.purchasedProducts[i].Quantity * Model.purchasedProducts[i].product.Price)</td>
                         </tr>
                     }
                 }
@@ -57,8 +58,16 @@
             <input asp-for="QuantityPurchasedProduct" />
             <label asp-for="TransactionValue" class="control-label">Wartość transakcji</label>
             <input asp-for="@Model.TransactionValue" disabled />
+            <input asp-for="@Model.TransactionValue" hidden />
+            @if (ViewBag.QuantityProductError != null)
+            {
+                <p style="color:red">@ViewBag.QuantityProductError</p>
+            }
             <div class="form-group">
                 <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Zatwierdź transakcję" class="btn btn-primary" formaction="AddTransactionPOST" />
             </div>
         </form>
     </div>

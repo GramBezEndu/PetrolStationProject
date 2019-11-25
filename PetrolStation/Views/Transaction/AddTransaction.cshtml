@@ -27,8 +27,49 @@
                     <input asp-for=">@Model.purchasedProducts[i].Quantity" hidden />
                 }
             }
+            @if (Model.purchasedFueling.Count != 0)
+            {
+                for (var i = 0; i < Model.purchasedFueling.Count; i++)
+                {
+                    <input asp-for="@Model.purchasedFueling[i].VelueOfFueling" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.Date" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.IdGasPump" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.Quantity" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.IdFuel" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.IdFueling" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.IdFuel" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.Name" hidden />
+                    <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.PriceForLiter" hidden />
+                }
+            }
             <input asp-for="@Model.IsInvoice" hidden />
 
+            <table class="table table-striped">
+                <tr>
+                    <th scope="col">Numer dystrybutora</th>
+                    <th scope="col">Nazwa paliwa</th>
+                    <th scope="col">Ilość</th>
+                    <th scope="col">Cena za litr</th>
+                    <th scope="col">Wartość brutto</th>
+                    <th scope="col">Rozliczyć?</th>
+                </tr>
+                @if (Model.purchasedFueling.Count != 0)
+                {
+                    for (var i = 0; i < Model.purchasedFueling.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.purchasedFueling[i].fueling.IdGasPump</td>
+                            <td>@Model.purchasedFueling[i].fueling.Fuel.Name</td>
+                            <td>@Model.purchasedFueling[i].fueling.Quantity</td>
+                            <td>@Model.purchasedFueling[i].fueling.Fuel.PriceForLiter</td>
+                            <td>@Model.purchasedFueling[i].VelueOfFueling</td>
+                            <td><input type="checkbox" asp-for="@Model.purchasedFueling[i].IsChecked"  /></td>
+                        </tr>
+                    }
+                }
+            </table>
+
+            <br /><br />
             <table>
                 <tr>
                     <th>Nazwa produktu</th>
@@ -57,12 +98,15 @@
             <label asp-for="QuantityPurchasedProduct" class="control-label">Ilość produktu</label>
             <input asp-for="QuantityPurchasedProduct" />
             <label asp-for="TransactionValue" class="control-label">Wartość transakcji</label>
-            <input asp-for="@Model.TransactionValue" disabled />
-            <input asp-for="@Model.TransactionValue" hidden />
+            <input asp-for="@Model.TransactionValue" disabled class="wartoscTransakcji"/>
+            <input asp-for="@Model.TransactionValue" hidden class="wartoscTransakcji"/>
             @if (ViewBag.QuantityProductError != null)
             {
                 <p style="color:red">@ViewBag.QuantityProductError</p>
             }
+            <br />
+            <label for="@Model.IdLoyalityCard">@Model.IdLoyalityCard</label>
+            <input asp-for="@Model.IdLoyalityCard" />
             <div class="form-group">
                 <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
             </div>

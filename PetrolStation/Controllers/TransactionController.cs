@@ -54,6 +54,20 @@ namespace PetrolStation.Controllers
             transactionModel.QuantityPurchasedProduct = 1;
             transactionModel.IsInvoice = false;
             transactionModel.TransactionValue = 0;
+
+            //lista tankowań nierozliczonych
+            var settledFuelings = _context.FuelingList.Select(fl => fl.IdFueling).ToList();
+            var unsettledFuelings = _context.Fueling.Where(f => !settledFuelings.Contains(f.IdFueling)).OrderBy(f=>f.IdGasPump).ToList();
+            foreach(var item in unsettledFuelings)
+            {
+                var thisFuel = _context.Fuel.Find(item.IdFuel);
+                FuelingModel fuelingModel = new FuelingModel(item);
+                fuelingModel.fueling.Fuel = thisFuel;
+                fuelingModel.VelueOfFueling = Convert.ToDecimal((Convert.ToDecimal(item.Quantity) * thisFuel.PriceForLiter).ToString("F"));
+                transactionModel.purchasedFueling.Add(fuelingModel);
+                
+            }
+
             return View(transactionModel);
         }
 
@@ -94,48 +108,61 @@ namespace PetrolStation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTransactionPOST(TransactionModel transactionModel)
         {
-            if (!transactionModel.IsInvoice) //paragon
+            Transaction transaction = new Transaction
             {
-                Transaction transaction = new Transaction();
-                transaction.Date = DateTime.Now;
-                if(transactionModel.IdLoyalityCard==0)
-                    transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
-                else //do transakcji została dołączona karta
-                {
-                    transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
-                    var CardToAddPoints = _context.LoyalityCard.Find(transaction.IdLoyalityCard);
-                    //dodanie punktów zależne od wartości transakcji
-                    CardToAddPoints.ActualPoints += Convert.ToInt32(transactionModel.TransactionValue) / 10;
-                    _context.Update(CardToAddPoints);
-                    _context.SaveChanges();
-                }
-                //dodanie rekordu do tabeli "Transactions" oraz zapisanie zmian
-                _context.Add(transaction);
+                Date = DateTime.Now
+            };
+            if (transactionModel.IdLoyalityCard == 0)
+                transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
+            else //do transakcji została dołączona karta
+            {
+                transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
+                var CardToAddPoints = _context.LoyalityCard.Find(transaction.IdLoyalityCard);
+                //dodanie punktów zależne od wartości transakcji. (!!!)dodanie wartości za tankowania w widoku
+                CardToAddPoints.ActualPoints += Convert.ToInt32(transactionModel.TransactionValue) / 10;
+                _context.Update(CardToAddPoints);
                 _context.SaveChanges();
-                var thisTransaction=_context.Transaction.Where(t => t == transaction).ToList();
-                //dodajemy powiązania do tabeli "ListaTowarów"
-                foreach(var product in transactionModel.purchasedProducts)
+            }
+            //dodanie rekordu do tabeli "Transactions" oraz zapisanie zmian
+            _context.Add(transaction);
+            _context.SaveChanges();
+            var thisTransaction = _context.Transaction.Where(t => t == transaction).ToList(); //pobranie utworzonej transakcji
+
+            //dodajemy powiązania do tabeli "ListaTowarów"
+            foreach (var product in transactionModel.purchasedProducts)
+            {
+                ProductList productList = new ProductList
                 {
-                    ProductList productList = new ProductList
+                    IdTransaction = thisTransaction[0].IdTransaction,
+                    IdProduct = product.product.IdProduct,
+                    Quantity = product.Quantity
+                };
+                Product productToUpdateQuantityStorage = product.product;
+                //odejmujemy ze stanu, ilosć sprzedanego towaru
+                productToUpdateQuantityStorage.QuantityInStorage -= productList.Quantity;
+                _context.Update(productToUpdateQuantityStorage);
+                _context.Add(productList);
+            }
+            _context.SaveChanges();
+            //obsługa sprzedanego paliwa
+
+            foreach(var item in transactionModel.purchasedFueling)
+            {
+                if (item.IsChecked == true)
+                {
+                    FuelingList fuelingList = new FuelingList
                     {
                         IdTransaction = thisTransaction[0].IdTransaction,
-                        IdProduct = product.product.IdProduct,
-                        Quantity = product.Quantity
+                        IdFueling = item.fueling.IdFueling,
                     };
-                    Product productToUpdateQuantityStorage = new Product
-                    {
-                        IdProduct = productList.IdProduct,
-                        Name = product.product.Name,
-                        Price = product.product.Price,
-                        PriceInPoints = product.product.PriceInPoints,
-                        QuantityInStorage = product.Quantity
-                    };
-                    //odejmujemy ze stanu, ilosć sprzedanego towaru
-                    productToUpdateQuantityStorage.QuantityInStorage -= productList.Quantity;
-                    _context.Update(productToUpdateQuantityStorage);
-                    _context.Add(productList);
+                    _context.Add(fuelingList);
                 }
-                _context.SaveChanges();
+            }
+            _context.SaveChanges();
+
+            if (transactionModel.IsInvoice) //faktura
+            {
+               
                 
             }
 

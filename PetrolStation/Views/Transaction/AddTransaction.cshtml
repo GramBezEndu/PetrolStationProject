@@ -100,9 +100,9 @@
             <label asp-for="TransactionValue" class="control-label">Wartość transakcji</label>
             <input asp-for="@Model.TransactionValue" disabled class="wartoscTransakcji"/>
             <input asp-for="@Model.TransactionValue" hidden class="wartoscTransakcji"/>
-            @if (ViewBag.QuantityProductError != null)
+            @if (ViewBag.Error != null)
             {
-                <p style="color:red">@ViewBag.QuantityProductError</p>
+                <p style="color:red">@ViewBag.Error</p>
             }
             <br />
             <label for="@Model.IdLoyalityCard">@Model.IdLoyalityCard</label>
@@ -110,6 +110,8 @@
             <div class="form-group">
                 <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
             </div>
+            <label asp-for="@Model.CardPayment">Płatność punktami</label>
+            <input type="checkbox" asp-for="@Model.CardPayment" />
             <div class="form-group">
                 <input type="submit" value="Zatwierdź transakcję" class="btn btn-primary" formaction="AddTransactionPOST" />
             </div>

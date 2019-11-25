@@ -53,6 +53,7 @@ namespace PetrolStation.Controllers
             TransactionModel transactionModel = new TransactionModel();
             transactionModel.QuantityPurchasedProduct = 1;
             transactionModel.IsInvoice = false;
+            transactionModel.CardPayment = false;
             transactionModel.TransactionValue = 0;
 
             //lista tankowań nierozliczonych
@@ -71,14 +72,14 @@ namespace PetrolStation.Controllers
             return View(transactionModel);
         }
 
-
+        [HttpPost]
         public IActionResult AddProduct(TransactionModel transactionModel)
         {
             var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
             if (szukanyProdukt[0].QuantityInStorage < transactionModel.QuantityPurchasedProduct)
             {
                 ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-                ViewData["QuantityProductError"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
+                ViewData["Error"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
                 return View("AddTransaction", transactionModel);
             }
             ProductQuantity productQuantity = new ProductQuantity();
@@ -117,11 +118,25 @@ namespace PetrolStation.Controllers
             else //do transakcji została dołączona karta
             {
                 transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
-                var CardToAddPoints = _context.LoyalityCard.Find(transaction.IdLoyalityCard);
+                var pointsRequiredForPayment = transactionModel.TransactionValue*100;
+                var CardToAddPoints = await _context.LoyalityCard.FindAsync(transaction.IdLoyalityCard);
+                if (transactionModel.CardPayment)
+                {
+                    if (CardToAddPoints.ActualPoints >= pointsRequiredForPayment)
+                    {
+                        CardToAddPoints.ActualPoints -= Convert.ToInt32(pointsRequiredForPayment);
+                        _context.Update(CardToAddPoints);
+                    }
+                    else
+                    {
+                        ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+                        ViewData["Error"] = "This card doesn't have enough points to pay for this transaction";
+                        return View("AddTransaction", transactionModel);
+                    }
+                }
                 //dodanie punktów zależne od wartości transakcji. (!!!)dodanie wartości za tankowania w widoku
                 CardToAddPoints.ActualPoints += Convert.ToInt32(transactionModel.TransactionValue) / 10;
                 _context.Update(CardToAddPoints);
-                _context.SaveChanges();
             }
             //dodanie rekordu do tabeli "Transactions" oraz zapisanie zmian
             _context.Add(transaction);
@@ -186,7 +201,7 @@ namespace PetrolStation.Controllers
             {
                 return NotFound();
             }
-            ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard", transaction.IdLoyalityCard);
+            //ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard", transaction.IdLoyalityCard);
             return View(transaction);
         }
 

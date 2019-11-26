@@ -15,6 +15,16 @@ namespace PetrolStation.Models.ModelePomocnicze
         public Car Car { get; set; }
         public List<ProductList> PurchasedProducts { get; set; } = new List<ProductList>();
         public List<FuelingList> FuelingList { get; set; } = new List<FuelingList>();
-
+        public string ClientString { get; set; }
+        public string TransactionType
+        {
+            get
+            {
+                if (IsInvoice)
+                    return "Invoice";
+                else
+                    return "Transaction";
+            }
+        }
     }
 }

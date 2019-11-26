@@ -184,9 +184,15 @@ namespace PetrolStation.Controllers
 
             if (transactionModel.IsInvoice) //faktura
             {
-
-
+                TransactionInvoice transactionInvoice = new TransactionInvoice
+                {
+                    IdTransaction = thisTransaction.IdTransaction,
+                    IdClient = transactionModel.client.IdClient,
+                    IdCar = transactionModel.clientCar.IdCar
+                };
+                _context.Add(transactionInvoice);
             }
+            await _context.SaveChangesAsync();
             return View("AddTransaction", transactionModel);
         }
     }

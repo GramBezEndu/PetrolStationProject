@@ -66,7 +66,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="AddProduct">
+        <form asp-action="AddTransactionPOST" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <!--
     kod
@@ -141,6 +141,7 @@
                 </tbody>
             </table>
             <h3 id="sum"></h3>
+            <input id="bought_input" asp-for="@Model.boughtString" hidden ="hidden" />
             <div class="autofill">
                 <label>
                     Produkt
@@ -148,7 +149,7 @@
                 </label>
                 <input type="button" value="dodaj" id="add_product"/>
             </div>
-            <div>
+            <div class="autofill">
                 <h1>Paragon</h1>
                 <label>
                     Numer karty
@@ -158,9 +159,9 @@
                 <input id="show_invoice" type="button" value="Faktura" checked="">
             <div id="invoice" hidden="hidden">
                 <h1 >Faktura</h1>
-                <label>
+                <label class="autofill">
                     Wyszukiwanie
-                    <input id="search">
+                    <input id="client_id">
                 </label><br>
                 <label>
                     Nazwa
@@ -168,7 +169,7 @@
                 </label><br>
                 <label>
                     NIP
-                    <input id="nip">
+                    <input asp-for="@Model.client.NIP" id="nip">
                 </label><br>
                 <label>
                     Imię
@@ -233,13 +234,10 @@
             <br />
             <label for="@Model.IdLoyalityCard">@Model.IdLoyalityCard</label>
             <input asp-for="@Model.IdLoyalityCard" />
-            <div class="form-group">
-                <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
-            </div>
             <label asp-for="@Model.CardPayment">Płatność punktami</label>
             <input type="checkbox" asp-for="@Model.CardPayment" />
             <div class="form-group">
-                <input type="submit" value="Zatwierdź transakcję" class="btn btn-primary" formaction="AddTransactionPOST" />
+                <input type="button" id="send" value="Zatwierdź transakcję" class="btn btn-primary" formaction="AddTransactionPOST" />
             </div>
         </form>
     </div>
@@ -252,10 +250,12 @@
 
 <script>
     class Product {
-        constructor(id, name, price) {
-            this.id = id
+        constructor(id, name, storage, price, points) {
+            this.id = parseInt(id);
             this.name = name;
+            this.storage = parseInt(storage);
             this.price = parseFloat(price);
+            this.points = parseInt(points);
         }
     }
 
@@ -268,7 +268,13 @@
                 return;
             while (products.length > 0) {
                 temp = products.pop();
-                this.addProduct(new Product(1, temp.Value, temp.Text));
+                this.addProduct(new Product(
+                    temp.IdProduct,
+                    temp.Name,
+                    temp.QuantityInStorage,
+                    temp.Price,
+                    temp.PriceInPoints
+                ));
             }
         }
 
@@ -307,10 +313,20 @@
                 }
             }
         }
+
+        returnBought() {
+            let string = "";
+            for (let product of this.list) {
+                string += product.id.toString() + "," + "1" + ";";
+            }
+            return string;
+        }
     }
 
     class Car {
-        constructor(plate, brand, model) {
+        constructor(id, clientId, plate, brand, model) {
+            this.id = parseInt(id);
+            this.clientId = parseInt(clientId);
             this.plate = plate;
             this.brand = brand;
             this.model = model;
@@ -323,15 +339,24 @@
             let temp;
             while (cars.length > 0) {
                 temp = cars.pop();
-                this.list.push(new Car(temp.Value, temp.Text, temp.Text));
+                this.list.push(new Car(
+                    temp.IdCar,
+                    temp.IdClient,
+                    temp.NumberPlate,
+                    temp.CarBrand,
+                    temp.CarModel
+                ));
             }
         }
     }
 
     class Card {
-        constructor(number) {
-            this.number = number;
+        constructor(id, clientId, points) {
+            this.id = parseInt(id);
+            this.clientId = parseInt(clientId);
+            this.points = parseInt(points);
         }
+
     }
 
     class CardList {
@@ -340,22 +365,87 @@
             let temp;
             while (cards.length > 0) {
                 temp = cards.pop();
-                this.list.push(new Card(temp.Value));
+                this.list.push(new Card(
+                    temp.IdLoyalityCard,
+                    temp.IdClient,
+                    temp.ActualPoints
+                ));
             }
+        }
+
+        getList() {
+            return this.list;
         }
     }
 
-    var produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
+    class Client {
+        constructor(id, name, firstName, surname, nip, street, houseNumber, apartmentNumber, postalCode, city) {
+            this.id = parseInt(id);
+            this.name = name;
+            this.firstName = firstName;
+            this.surname = surname;
+            this.nip = nip;
+            this.street = street;
+            this.houseNumber = houseNumber;
+            this.apartmentNumber = apartmentNumber;
+            this.postalCode = postalCode;
+            this.city = city;
+        }
+    }
+
+    class ClientList {
+        constructor(clients) {
+            this.list = [];
+            let temp;
+            while (clients.length > 0) {
+                temp = clients.pop();
+                this.list.push(new Client(
+                    temp.IdClient,
+                    temp.Name,
+                    temp.FirstName,
+                    temp.Surname,
+                    temp.NIP,
+                    temp.Street,
+                    temp.HouseNumber,
+                    temp.ApartmentNumber,
+                    temp.Postcode,
+                    temp.Locality
+                ));
+            }
+        }
+
+        getList() {
+            return this.list;
+        }
+    }
+
+    let produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
+    let karty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Karty));
+    let klienci = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Klienci));
+    let samochody = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Samochody));
 
     let available = new ProductList(produkty);
     let bought = new ProductList();
+    let cards = new CardList(karty);
+    let cars = new CarList(samochody);
+    let clients = new ClientList(klienci);
 
 
     let product_input = document.getElementById("product_id");
     let product_button = document.getElementById("add_product");
+    let card_input = document.getElementById("card_id");
+    let car_input;
+    let client_input = document.getElementById("client_id");
+
+    let submit_button = document.getElementById("send");
+
     let invoice_button = document.getElementById("show_invoice");
+
     product_input.focus();
+
     autofill(product_input, available.getList());
+    autofill(card_input, cards.getList());
+    autofill(client_input, clients.getList());
 
     product_button.addEventListener("click", function (e) {
         if (!product_input.value) return;
@@ -377,16 +467,22 @@
     });
 
     invoice_button.addEventListener("click", function (e) {
-        console.log(this.checked);
         if (this.getAttribute("checked") === "checked") {
-            console.log("chowam");
             document.getElementById("invoice").hidden = true;
             this.setAttribute("checked", "");
         } else {
-            console.log("odsłaniam");
             document.getElementById("invoice").hidden = false;
             this.setAttribute("checked", "checked");
         }
+    });
+
+    submit_button.addEventListener("click", function (e) {
+        e.preventDefault();
+        let return_bought = document.getElementById("bought_input");
+        return_bought.value = bought.returnBought();
+        document.getElementById("form").submit();
+        console.log("pułapka");
+        //this.click();
     });
 
     function updateBought() {
@@ -438,10 +534,30 @@
                         } else {
                             y.innerHTML += object_list[i][j].toString();
                         }
-                        y.addEventListener("click", function (e) {
-                            input.data = i;
-                            input.value = object_list[i]["name"];
-                        });
+                        switch (this.id) {
+                            case "product_id":
+                                y.addEventListener("click", function (e) {
+                                    input.data = i;
+                                    input.value = object_list[i]["name"];
+                                });
+                                break;
+                            case "card_id":
+                                y.addEventListener("click", function (e) {
+                                    input.value = object_list[i]["id"];
+                                });
+                                break;
+                            case "car_id":
+                                y.addEventListener("click", function (e) {
+                                    input.value = object_list[i]["plate"];
+                                });
+                                break;
+                            case "client_id":
+                                y.addEventListener("click", function (e) {
+                                    input.value = object_list[i]["id"];
+                                });
+                            default:
+                                break;
+                        }
                     }
                     x.appendChild(y);
                 }

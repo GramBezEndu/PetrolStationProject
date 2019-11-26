@@ -39,19 +39,16 @@ namespace PetrolStation.Controllers
                 if (actualExtendedTransaction.Transaction is TransactionInvoice transactionInvoice)
                 {
                     actualExtendedTransaction.Client = _context.Client.Where(x => x.IdClient == transactionInvoice.IdClient).ToList()[0];
-                    if(actualExtendedTransaction.Client.Name != null)
-                    {
-                        actualExtendedTransaction.ClientString = actualExtendedTransaction.Client.Name;
-                    }
-                    else
-                    {
-                        actualExtendedTransaction.ClientString = actualExtendedTransaction.Client.FirstName + " "  + actualExtendedTransaction.Client.Surname;
-                    }
                 }
                 //wlasciciel karty
                 if (actualExtendedTransaction.LoyalityCard != null)
                 {
                     actualExtendedTransaction.LoyalityCardOwner = _context.Client.Where(x => x.IdClient == actualExtendedTransaction.LoyalityCard.IdClient).FirstOrDefault();
+                    //case: There is no client - assign client = cardOwner
+                    if(actualExtendedTransaction.Client == null)
+                    {
+                        actualExtendedTransaction.Client = actualExtendedTransaction.LoyalityCardOwner;
+                    }
                 }
                 ////assign client
                 //if (actualExtendedTransaction.LoyalityCard != null)

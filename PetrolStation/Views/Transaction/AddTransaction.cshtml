@@ -199,33 +199,7 @@
                     <input id="country">
                 </label>
             </div>
-            <table>
-                <tr>
-                    <th>Nazwa produktu</th>
-                    <th>Cena produktu</th>
-                    <th>Ilość</th>
-                    <th>Cena brutto</th>
-                </tr>
-                @if (Model.purchasedProducts.Count != 0)
-                {
-                    for (var i = 0; i < Model.purchasedProducts.Count; i++)
-                    {
-                        <tr>
-                            <td>@Model.purchasedProducts[i].product.Name</td>
-                            <td>@Model.purchasedProducts[i].product.Price</td>
-                            <td>@Model.purchasedProducts[i].Quantity</td>
-                            <td>@(Model.purchasedProducts[i].Quantity * Model.purchasedProducts[i].product.Price)</td>
-                        </tr>
-                    }
-                }
-            </table>
-            <br />
-            <div class="form-group">
-                <label asp-for="NamePurchasedProduct" class="control-label">Nazwa produktu</label>
-                <select asp-for="NamePurchasedProduct" class="form-control" asp-items="ViewBag.Produkty"></select>
-            </div>
-            <label asp-for="QuantityPurchasedProduct" class="control-label">Ilość produktu</label>
-            <input asp-for="QuantityPurchasedProduct" />
+
             <label asp-for="TransactionValue" class="control-label">Wartość transakcji</label>
             <input asp-for="@Model.TransactionValue" disabled class="wartoscTransakcji"/>
             <input asp-for="@Model.TransactionValue" hidden class="wartoscTransakcji"/>
@@ -234,13 +208,9 @@
                 <p style="color:red">@ViewBag.Error</p>
             }
             <br />
-            <label for="@Model.IdLoyalityCard">@Model.IdLoyalityCard</label>
-            <input asp-for="@Model.IdLoyalityCard" />
             <div class="form-group">
-                <input type="submit" value="Dodaj produkt" class="btn btn-primary" formaction="AddProduct" />
+                <input asp-for="@Model.IsInvoice" id="IsInvoice" hidden/>
             </div>
-            <label asp-for="@Model.CardPayment">Płatność punktami</label>
-            <input type="checkbox" asp-for="@Model.CardPayment" />
             <div class="form-group">
                 <input type="submit" value="Zatwierdź transakcję" class="btn btn-primary" formaction="AddTransactionPOST" />
             </div>
@@ -384,10 +354,12 @@
         if (this.getAttribute("checked") === "checked") {
             console.log("chowam");
             document.getElementById("invoice").hidden = true;
+            document.getElementById("IsInvoice").checked = false;
             this.setAttribute("checked", "");
         } else {
             console.log("odsłaniam");
             document.getElementById("invoice").hidden = false;
+            document.getElementById("IsInvoice").checked = true;
             this.setAttribute("checked", "checked");
         }
     });

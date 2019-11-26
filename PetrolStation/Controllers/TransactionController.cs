@@ -111,6 +111,7 @@ namespace PetrolStation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTransactionPOST(TransactionModel transactionModel)
         {
+            //parsowanie stringa i stworzenie listy kupionych produktów
             List<ProductQuantity> purchasedProducts = new List<ProductQuantity>();
             if (transactionModel.boughtString != null)
             {
@@ -163,10 +164,27 @@ namespace PetrolStation.Controllers
                     _context.Update(CardToAddPoints);
                 }
             }
+            Transaction thisTransaction;
+            TransactionInvoice transactionInvoice = new TransactionInvoice();
+            //jeśli klient chce fakture
+            if (transactionModel.IsInvoice)
+            {
+                transactionInvoice.Date = transaction.Date;
+                transactionInvoice.IdLoyalityCard = transaction.IdLoyalityCard;
+                transactionInvoice.IdCar = 1;
+                transactionInvoice.IdClient = 1;
+                _context.Add(transactionInvoice);
+                _context.SaveChanges();
+                thisTransaction=_context.Transaction.Where(t => t == transactionInvoice).ToList()[0];
+            }
+            else //jeśli nie, to paragon
+            {
+                _context.Add(transaction);
+                _context.SaveChanges();
+                thisTransaction = _context.Transaction.Where(t => t == transaction).ToList()[0];
+            }
+
             //dodanie rekordu do tabeli "Transactions" oraz zapisanie zmian
-            _context.Add(transaction);
-            _context.SaveChanges();
-            var thisTransaction = _context.Transaction.Where(t => t == transaction).ToList()[0]; //pobranie utworzonej transakcji
 
             //dodajemy powiązania do tabeli "ListaTowarów"
             foreach (var product in purchasedProducts)
@@ -183,7 +201,7 @@ namespace PetrolStation.Controllers
                 _context.Update(productToUpdateQuantityStorage);
                 _context.Add(productList);
             }
-            _context.SaveChanges();
+           // _context.SaveChanges();
             //obsługa sprzedanego paliwa
 
             foreach (var item in transactionModel.purchasedFueling)
@@ -198,18 +216,6 @@ namespace PetrolStation.Controllers
                     _context.Add(fuelingList);
                     //??? Będziemy odejmować sprzedane paliwo ze zbiorników???
                 }
-            }
-            _context.SaveChanges();
-
-            if (transactionModel.IsInvoice) //faktura
-            {
-                TransactionInvoice transactionInvoice = new TransactionInvoice
-                {
-                    IdTransaction = thisTransaction.IdTransaction,
-                    IdClient = transactionModel.client.IdClient,
-                    IdCar = transactionModel.clientCar.IdCar
-                };
-                _context.Add(transactionInvoice);
             }
             await _context.SaveChangesAsync();
             return View("AddTransaction", transactionModel);

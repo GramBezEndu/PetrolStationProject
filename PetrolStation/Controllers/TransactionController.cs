@@ -5,6 +5,7 @@ using PetrolStation.ExtensionMethods;
 using PetrolStation.Models;
 using PetrolStation.Models.ModelePomocnicze;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -54,7 +55,6 @@ namespace PetrolStation.Controllers
             ViewData["Samochody"] = _context.Car.ToList();
             TransactionModel transactionModel = new TransactionModel
             {
-                QuantityPurchasedProduct = 1,
                 IsInvoice = false,
                 CardPayment = false,
                 TransactionValue = 0
@@ -111,6 +111,7 @@ namespace PetrolStation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddTransactionPOST(TransactionModel transactionModel)
         {
+            List<ProductQuantity> purchasedProducts = new List<ProductQuantity>();
             Transaction transaction = new Transaction
             {
                 Date = DateTime.Now
@@ -152,7 +153,7 @@ namespace PetrolStation.Controllers
             var thisTransaction = _context.Transaction.Where(t => t == transaction).ToList()[0]; //pobranie utworzonej transakcji
 
             //dodajemy powiązania do tabeli "ListaTowarów"
-            foreach (var product in transactionModel.purchasedProducts)
+            foreach (var product in purchasedProducts)
             {
                 ProductList productList = new ProductList
                 {

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetrolStation.ExtensionMethods;
 using PetrolStation.Models;
 using PetrolStation.Models.ModelePomocnicze;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PetrolStation.Controllers
 {
@@ -51,19 +50,46 @@ namespace PetrolStation.Controllers
         {
             ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard");
             ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-            TransactionModel transactionModel = new TransactionModel();
-            transactionModel.TransactionValue = 0;
+            TransactionModel transactionModel = new TransactionModel
+            {
+                QuantityPurchasedProduct = 1,
+                IsInvoice = false,
+                CardPayment = false,
+                TransactionValue = 0
+            };
+
+            //lista tankowań nierozliczonych
+            var settledFuelings = _context.FuelingList.Select(fl => fl.IdFueling).ToList();
+            var unsettledFuelings = _context.Fueling.Where(f => !settledFuelings.Contains(f.IdFueling)).OrderBy(f => f.IdGasPump).ToList();
+            foreach (var item in unsettledFuelings)
+            {
+                var thisFuel = _context.Fuel.Find(item.IdFuel);
+                FuelingModel fuelingModel = new FuelingModel(item);
+                fuelingModel.fueling.Fuel = thisFuel;
+                fuelingModel.VelueOfFueling = Convert.ToDecimal((Convert.ToDecimal(item.Quantity) * thisFuel.PriceForLiter).ToString("F"));
+                transactionModel.purchasedFueling.Add(fuelingModel);
+
+            }
+
             return View(transactionModel);
         }
 
-        
+        [HttpPost]
         public IActionResult AddProduct(TransactionModel transactionModel)
         {
             var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
+            if (szukanyProdukt[0].QuantityInStorage < transactionModel.QuantityPurchasedProduct)
+            {
+                ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+                ViewData["Error"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
+                return View("AddTransaction", transactionModel);
+            }
             ProductQuantity productQuantity = new ProductQuantity();
             productQuantity.product = szukanyProdukt[0];
             productQuantity.Quantity = transactionModel.QuantityPurchasedProduct;
             transactionModel.purchasedProducts.Add(productQuantity);
+            //wyzerowanie
+            transactionModel.TransactionValue = 0;
             foreach (var item in transactionModel.purchasedProducts)
                 transactionModel.TransactionValue += (item.Quantity * item.product.Price);
             transactionModel.QuantityPurchasedProduct = 1;
@@ -78,109 +104,87 @@ namespace PetrolStation.Controllers
             return View("AddTransaction", transactionModel);
         }
 
-        // POST: Transaction/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //POST AddTransaction
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddTransationPOST([Bind("IdTransaction,IdLoyalityCard,Date")] Transaction transaction)
+        public async Task<IActionResult> AddTransactionPOST(TransactionModel transactionModel)
         {
-            if (ModelState.IsValid)
+            Transaction transaction = new Transaction
             {
-                _context.Add(transaction);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard", transaction.IdLoyalityCard);
-            return View(transaction);
-        }
-
-        // GET: Transaction/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+                Date = DateTime.Now
+            };
+            if (transactionModel.IdLoyalityCard == 0)
+                transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
+            else //do transakcji została dołączona karta
             {
-                return NotFound();
-            }
-
-            var transaction = await _context.Transaction.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-            ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard", transaction.IdLoyalityCard);
-            return View(transaction);
-        }
-
-        // POST: Transaction/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdTransaction,IdLoyalityCard,Date")] Transaction transaction)
-        {
-            if (id != transaction.IdTransaction)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
+                var pointsRequiredForPayment = transactionModel.TransactionValue * 100;
+                var CardToAddPoints = await _context.LoyalityCard.FindAsync(transaction.IdLoyalityCard);
+                if (transactionModel.CardPayment) //osoba chce zapłacić kartą
                 {
-                    _context.Update(transaction);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TransactionExists(transaction.IdTransaction))
+                    if (CardToAddPoints.ActualPoints >= pointsRequiredForPayment) //jeśli na karcie jest wystarczająca ilość punktów
                     {
-                        return NotFound();
+                        CardToAddPoints.ActualPoints -= Convert.ToInt32(pointsRequiredForPayment);
+                        _context.Update(CardToAddPoints);
                     }
-                    else
+                    else //nie ma wystarczającej ilości punktów- powiadomienie o błędzie
                     {
-                        throw;
+                        ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+                        ViewData["Error"] = "This card doesn't have enough points to pay for this transaction";
+                        return View("AddTransaction", transactionModel);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                else //jeśli klient ma kartę, ale nie chce płacić punktami->dodajemy punkty za transakcję
+                {
+                    //dodanie punktów zależne od wartości transakcji. (!!!)dodanie wartości za tankowania w widoku
+                    CardToAddPoints.ActualPoints += Convert.ToInt32(transactionModel.TransactionValue) / 10;
+                    _context.Update(CardToAddPoints);
+                }
             }
-            ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard", transaction.IdLoyalityCard);
-            return View(transaction);
-        }
+            //dodanie rekordu do tabeli "Transactions" oraz zapisanie zmian
+            _context.Add(transaction);
+            _context.SaveChanges();
+            var thisTransaction = _context.Transaction.Where(t => t == transaction).ToList()[0]; //pobranie utworzonej transakcji
 
-        // GET: Transaction/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+            //dodajemy powiązania do tabeli "ListaTowarów"
+            foreach (var product in transactionModel.purchasedProducts)
             {
-                return NotFound();
+                ProductList productList = new ProductList
+                {
+                    IdTransaction = thisTransaction.IdTransaction,
+                    IdProduct = product.product.IdProduct,
+                    Quantity = product.Quantity
+                };
+                Product productToUpdateQuantityStorage = product.product;
+                //odejmujemy ze stanu, ilosć sprzedanego towaru
+                productToUpdateQuantityStorage.QuantityInStorage -= productList.Quantity;
+                _context.Update(productToUpdateQuantityStorage);
+                _context.Add(productList);
             }
+            _context.SaveChanges();
+            //obsługa sprzedanego paliwa
 
-            var transaction = await _context.Transaction
-                .Include(t => t.LoyalityCard)
-                .FirstOrDefaultAsync(m => m.IdTransaction == id);
-            if (transaction == null)
+            foreach (var item in transactionModel.purchasedFueling)
             {
-                return NotFound();
+                if (item.IsChecked)
+                {
+                    FuelingList fuelingList = new FuelingList
+                    {
+                        IdTransaction = thisTransaction.IdTransaction,
+                        IdFueling = item.fueling.IdFueling,
+                    };
+                    _context.Add(fuelingList);
+                    //??? Będziemy odejmować sprzedane paliwo ze zbiorników???
+                }
             }
+            _context.SaveChanges();
 
-            return View(transaction);
-        }
+            if (transactionModel.IsInvoice) //faktura
+            {
 
-        // POST: Transaction/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var transaction = await _context.Transaction.FindAsync(id);
-            _context.Transaction.Remove(transaction);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool TransactionExists(int id)
-        {
-            return _context.Transaction.Any(e => e.IdTransaction == id);
+            }
+            return View("AddTransaction", transactionModel);
         }
     }
 }

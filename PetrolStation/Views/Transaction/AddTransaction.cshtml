@@ -4,6 +4,62 @@
     ViewData["Title"] = "AddTransaction";
 }
 
+<style>
+    table.scroll tbody,
+    table.scroll thead {
+        display: block;
+        width: 100%;
+    }
+
+    table.scroll th {
+        width: 20%;
+    }
+
+    table.scroll tbody {
+        height: 150px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    #show_invoice[checked=""] { }
+
+    #show_invoice[checked="checked"] {
+        color: darkred;
+    }
+
+    .autofill {
+      position: relative;
+      display: inline-block;
+    }
+
+    .autofill_list {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      top: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .autofill_list div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff; 
+      border-bottom: 1px solid #d4d4d4; 
+    }
+
+    .autofill-items div:hover {
+        background-color: #e9e9e9; 
+    }
+
+    .autofill-active {
+        background-color: DodgerBlue !important; 
+        color: #ffffff; 
+    }
+</style>
+
 <h1>AddTransaction</h1>
 
 <h4>Transaction</h4>
@@ -70,6 +126,79 @@
             </table>
 
             <br /><br />
+            <table class="scroll" id="bought_list">
+                <thead>
+                    <tr>
+                        <th>Nazwa</th>
+                        <th>Cena produktu</th>
+                        <th>Ilość</th>
+                        <th>Suma</th>
+                        <th>Usuń</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <h3 id="sum"></h3>
+            <div class="autofill">
+                <label>
+                    Produkt
+                    <input id="product_id">
+                </label>
+                <input type="button" value="dodaj" id="add_product"/>
+            </div>
+            <div>
+                <h1>Paragon</h1>
+                <label>
+                    Numer karty
+                    <input id="card_id">
+                </label>
+            </div>
+                <input id="show_invoice" type="button" value="Faktura" checked="">
+            <div id="invoice" hidden="hidden">
+                <h1 >Faktura</h1>
+                <label>
+                    Wyszukiwanie
+                    <input id="search">
+                </label><br>
+                <label>
+                    Nazwa
+                    <input id="name">
+                </label><br>
+                <label>
+                    NIP
+                    <input id="nip">
+                </label><br>
+                <label>
+                    Imię
+                    <input id="first_name">
+                </label><br>
+                <label>
+                    Nazwisko
+                    <input id="surname">
+                </label><br>
+                <label>
+                    Ulica
+                    <input id="street">
+                </label><br>
+                <label>
+                    Numer domu
+                    <input id="house_number">
+                </label><br>
+                <label>
+                    Numer mieszkania
+                    <input id="apartment_number">
+                </label><br>
+                <label>
+                    Kod pocztowy
+                    <input id="postal_code">
+                </label><br>
+                <label>
+                    Kraj
+                    <input id="country">
+                </label>
+            </div>
             <table>
                 <tr>
                     <th>Nazwa produktu</th>
@@ -123,6 +252,256 @@
     <a asp-action="Index">Back to List</a>
 
 </div>
+
+<script>
+    class Product {
+        constructor(id, name, price) {
+            this.id = id
+            this.name = name;
+            this.price = parseFloat(price);
+        }
+    }
+
+    class ProductList {
+        constructor(products) {
+            this.list = [];
+            this.total = 0;
+            let temp;
+            if (products == undefined)
+                return;
+            while (products.length > 0) {
+                temp = products.pop();
+                this.addProduct(new Product(1, temp.Value, temp.Text));
+            }
+        }
+
+        addProduct(product) {
+            this.list.push(product);
+        }
+
+        printList() {
+            for (let product of this.list) {
+                console.log(product);
+            }
+        }
+
+        calculateTotal() {
+            for (let product of this.list)
+                this.total += product.price;
+        }
+
+        getTotal() {
+            this.calculateTotal();
+            return this.total;
+        }
+
+        getList() {
+            return this.list;
+        }
+
+        getProduct(x) {
+            return this.list[x];
+        }
+
+        searchById(x) {
+            for (let product of this.list) {
+                if (product.id === x) {
+                    return product;
+                }
+            }
+        }
+    }
+
+    class Car {
+        constructor(plate, brand, model) {
+            this.plate = plate;
+            this.brand = brand;
+            this.model = model;
+        }
+    }
+
+    class CarList {
+        constructor(cars) {
+            this.list = [];
+            let temp;
+            while (cars.length > 0) {
+                temp = cars.pop();
+                this.list.push(new Car(temp.Value, temp.Text, temp.Text));
+            }
+        }
+    }
+
+    class Card {
+        constructor(number) {
+            this.number = number;
+        }
+    }
+
+    class CardList {
+        constructor(cards) {
+            this.list = [];
+            let temp;
+            while (cards.length > 0) {
+                temp = cards.pop();
+                this.list.push(new Card(temp.Value));
+            }
+        }
+    }
+
+    var produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
+
+    let available = new ProductList(produkty);
+    let bought = new ProductList();
+
+
+    let product_input = document.getElementById("product_id");
+    let product_button = document.getElementById("add_product");
+    let invoice_button = document.getElementById("show_invoice");
+    product_input.focus();
+    autofill(product_input, available.getList());
+
+    product_button.addEventListener("click", function (e) {
+        if (!product_input.value) return;
+        if (product_input.data) {
+            bought.addProduct(available.getProduct(product_input.data));
+            product_input.data = null;
+        } else {
+            let temp = available.searchById(product_input.data);
+            if (temp) {
+                bought.addProduct(temp);
+            }
+            else {
+                //jakiś alert tutaj
+            }
+        }
+        product_input.value = null;
+        updateBought();
+        product_input.focus();
+    });
+
+    invoice_button.addEventListener("click", function (e) {
+        console.log(this.checked);
+        if (this.getAttribute("checked") === "checked") {
+            console.log("chowam");
+            document.getElementById("invoice").hidden = true;
+            this.setAttribute("checked", "");
+        } else {
+            console.log("odsłaniam");
+            document.getElementById("invoice").hidden = false;
+            this.setAttribute("checked", "checked");
+        }
+    });
+
+    function updateBought() {
+        let table = document.getElementById("bought_list");
+        let body = table.getElementsByTagName("tbody")[0];
+        body.innerHTML = "";
+        let row, cell;
+        let products = bought.getList()
+        for (let i = 0; i < products.length; i++) {
+            row = document.createElement("tr");
+            cell = document.createElement("th");
+            cell.innerHTML = products[products.length - 1 - i]["name"];
+            row.appendChild(cell);
+            body.appendChild(row);
+        }
+        document.getElementById("sum").innerText(bought.getTotal().toString());
+    }
+
+    function autofill(input, object_list) {
+
+        let highlighted;
+
+        input.addEventListener("input", function (e) {
+            closeLists();
+            let value = this.value;
+            let x, y;
+            if (!value) {
+                return false;
+            }
+            highlighted = -1;
+            x = document.createElement("div");
+            x.setAttribute("id", this.id + "autofill_list");
+            x.setAttribute("class", "autofill_list");
+            this.parentNode.appendChild(x);
+            for (let i = 0; i < object_list.length; i++) {
+                let indexes = [];
+                for (let j in object_list[i]) {
+                    if (object_list[i][j].toString().substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+                        indexes.push(j);
+                    }
+                }
+                if (indexes.length > 0) {
+                    y = document.createElement("div");
+                    y.innerHTML = "";
+                    for (let j in object_list[i]) {
+                        if (indexes.includes(j)) {
+                            y.innerHTML += "<strong>" + object_list[i][j].toString().substr(0, value.length) + "</strong>";
+                            y.innerHTML += object_list[i][j].toString().substr(value.length);
+                        } else {
+                            y.innerHTML += object_list[i][j].toString();
+                        }
+                        y.addEventListener("click", function (e) {
+                            input.data = i;
+                            input.value = object_list[i]["name"];
+                        });
+                    }
+                    x.appendChild(y);
+                }
+            }
+        });
+
+        input.addEventListener("keydown", function (e) {
+            let list = document.getElementById(this.id + "autofill_list");
+            if (list) {
+                list = list.getElementsByTagName("div");
+            }
+            if (e.keyCode == 40) { //down
+                highlighted++;
+                addActive(list);
+            } else if (e.keyCode == 38) { //up
+                highlighted--;
+                addActive(list);
+            } else if (e.keyCode == 13) { //enter
+                e.preventDefault();
+                if (highlighted > -1) {
+                    if (list) {
+                        list[highlighted].click();
+                    } else if (this.id == "product_id") {
+                        product_button.click();
+                    }
+                }
+            }
+        });
+
+        document.addEventListener("click", function (e) {
+            closeLists(e.target);
+        });
+
+        function closeLists(element) {
+            let lists = document.getElementsByClassName("autofill_list");
+            for (let i = 0; i < lists.length; i++) {
+                if (element != input) {
+                    lists[i].parentNode.removeChild(lists[i]);
+                }
+            }
+        }
+
+        function addActive(list) {
+            if (list.length < 1) return false;
+            removeActive(list);
+            if (highlighted >= list.length) highlighted = 0;
+            if (highlighted < 0) highlighted = (list.length - 1);
+            list[highlighted].classList.add("autofill-active");
+        }
+
+        function removeActive(list) {
+            for (var i = 0; i < list.length; i++) {
+                list[i].classList.remove("autofill-active");
+            }
+        }
+    }
+</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

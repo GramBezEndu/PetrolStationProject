@@ -48,8 +48,10 @@ namespace PetrolStation.Controllers
         // GET: Transaction/Create
         public IActionResult AddTransaction()
         {
-            ViewData["IdLoyalityCard"] = new SelectList(_context.LoyalityCard, "IdLoyalityCard", "IdLoyalityCard");
-            ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+            ViewData["Karty"] = _context.LoyalityCard.ToList();
+            ViewData["Produkty"] = _context.Product.ToList();
+            ViewData["Klienci"] = _context.Client.ToList();
+            ViewData["Samochody"] = _context.Car.ToList();
             TransactionModel transactionModel = new TransactionModel
             {
                 QuantityPurchasedProduct = 1,

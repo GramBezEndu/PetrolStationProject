@@ -112,6 +112,22 @@ namespace PetrolStation.Controllers
         public async Task<IActionResult> AddTransactionPOST(TransactionModel transactionModel)
         {
             List<ProductQuantity> purchasedProducts = new List<ProductQuantity>();
+            if (transactionModel.boughtString != null)
+            {
+                string[] IdProductsAndQuantity = transactionModel.boughtString.Split(',', ';');
+                for (int i = 0; i < IdProductsAndQuantity.Length - 1; i += 2)
+                {
+                    int key = Convert.ToInt32(IdProductsAndQuantity[i]);
+                    var product = _context.Product.Find(key);
+                    ProductQuantity productQuantity = new ProductQuantity
+                    {
+                        product = product,
+                        Quantity = Convert.ToInt32(IdProductsAndQuantity[i + 1])
+                    };
+                    purchasedProducts.Add(productQuantity);
+                }
+            }
+
             Transaction transaction = new Transaction
             {
                 Date = DateTime.Now

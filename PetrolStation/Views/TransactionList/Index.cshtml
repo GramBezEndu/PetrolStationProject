@@ -139,26 +139,47 @@
         <tr>
             @if (extendedTransaction.LoyalityCard != null)
             {
-                <td colspan="6">
-                    <table>
-                        <tr>
-                            <th scope="col">Card ID</th>
-                            <th scope="col">Owner ID</th>
-                            <th scope="col">Points on card</th>
-                        </tr>
-                        <tr>
-                            <td @*hidden*@>
-                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
-                            </td>
-                            <td @*hidden*@>
-                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
-                            </td>
-                        </tr>
-                    </table>
-                </td>
+            <td colspan="6">
+                <h4>Used loyality card</h4>
+                <table>
+                    <tr>
+                        <th scope="col">Card ID</th>
+                        <th scope="col">Points on card</th>
+                        <th scope="col">Owner ID</th>
+                        @foreach (var property in extendedTransaction.LoyalityCard.Client.GetType().GetProperties())
+                        {
+                            if (property.GetValue(extendedTransaction.LoyalityCard.Client) != null)
+                            {
+                                if (property.Name != "IdClient")
+                                {
+                                    <th scope="col">@property.Name</th>
+                                }
+                            }
+                        }
+                    </tr>
+                    <tr>
+                        <td @*hidden*@>
+                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+                        </td>
+                        <td @*hidden*@>
+                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
+                        </td>
+                        @foreach (var property in extendedTransaction.LoyalityCard.Client.GetType().GetProperties())
+                        {
+                            if (property.GetValue(extendedTransaction.LoyalityCard.Client) != null)
+                            {
+                                if (property.Name != "IdClient")
+                                {
+                                    <td scope="col">@property.GetValue(extendedTransaction.LoyalityCard.Client)</td>
+                                }
+                            }
+                        }
+                    </tr>
+                </table>
+            </td>
             }
         </tr>
     </tbody>

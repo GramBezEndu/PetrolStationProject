@@ -71,18 +71,7 @@
             <!--
     kod
     -->
-            @if (Model.purchasedProducts.Count != 0)
-            {
-                for (var i = 0; i < Model.purchasedProducts.Count; i++)
-                {
-                    <input asp-for=">@Model.purchasedProducts[i].product.Name" hidden />
-                    <input asp-for=">@Model.purchasedProducts[i].product.IdProduct" hidden />
-                    <input asp-for=">@Model.purchasedProducts[i].product.Price" hidden />
-                    <input asp-for=">@Model.purchasedProducts[i].product.PriceInPoints" hidden />
-                    <input asp-for=">@Model.purchasedProducts[i].product.QuantityInStorage" hidden />
-                    <input asp-for=">@Model.purchasedProducts[i].Quantity" hidden />
-                }
-            }
+           
             @if (Model.purchasedFueling.Count != 0)
             {
                 for (var i = 0; i < Model.purchasedFueling.Count; i++)

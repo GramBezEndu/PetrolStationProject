@@ -17,5 +17,6 @@ namespace PetrolStation.Models.ModelePomocnicze
         public bool CardPayment { get; set; }
         public int IdLoyalityCard { get; set; }
         public Client client { get; set; } = new Client();
+        public Car clientCar { get; set; } = new Car();
     }
 }

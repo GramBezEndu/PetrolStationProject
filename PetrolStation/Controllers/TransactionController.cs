@@ -76,35 +76,35 @@ namespace PetrolStation.Controllers
             return View(transactionModel);
         }
 
-        [HttpPost]
-        public IActionResult AddProduct(TransactionModel transactionModel)
-        {
-            var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
-            if (szukanyProdukt[0].QuantityInStorage < transactionModel.QuantityPurchasedProduct)
-            {
-                ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-                ViewData["Error"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
-                return View("AddTransaction", transactionModel);
-            }
-            ProductQuantity productQuantity = new ProductQuantity();
-            productQuantity.product = szukanyProdukt[0];
-            productQuantity.Quantity = transactionModel.QuantityPurchasedProduct;
-            transactionModel.purchasedProducts.Add(productQuantity);
-            //wyzerowanie
-            transactionModel.TransactionValue = 0;
-            foreach (var item in transactionModel.purchasedProducts)
-                transactionModel.TransactionValue += (item.Quantity * item.product.Price);
-            transactionModel.QuantityPurchasedProduct = 1;
-            TempData.Put("key", transactionModel);
-            return RedirectToAction("AddProductWyswietl");
-        }
+        //[HttpPost]
+        //public IActionResult AddProduct(TransactionModel transactionModel)
+        //{
+        //    var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
+        //    if (szukanyProdukt[0].QuantityInStorage < transactionModel.QuantityPurchasedProduct)
+        //    {
+        //        ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+        //        ViewData["Error"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
+        //        return View("AddTransaction", transactionModel);
+        //    }
+        //    ProductQuantity productQuantity = new ProductQuantity();
+        //    productQuantity.product = szukanyProdukt[0];
+        //    productQuantity.Quantity = transactionModel.QuantityPurchasedProduct;
+        //    transactionModel.purchasedProducts.Add(productQuantity);
+        //    //wyzerowanie
+        //    transactionModel.TransactionValue = 0;
+        //    foreach (var item in transactionModel.purchasedProducts)
+        //        transactionModel.TransactionValue += (item.Quantity * item.product.Price);
+        //    transactionModel.QuantityPurchasedProduct = 1;
+        //    TempData.Put("key", transactionModel);
+        //    return RedirectToAction("AddProductWyswietl");
+        //}
 
-        public IActionResult AddProductWyswietl()
-        {
-            var transactionModel = TempData.Get<TransactionModel>("key");
-            ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-            return View("AddTransaction", transactionModel);
-        }
+        //public IActionResult AddProductWyswietl()
+        //{
+        //    var transactionModel = TempData.Get<TransactionModel>("key");
+        //    ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+        //    return View("AddTransaction", transactionModel);
+        //}
 
         //POST AddTransaction
         [HttpPost]
@@ -131,7 +131,10 @@ namespace PetrolStation.Controllers
                     }
                     else //nie ma wystarczającej ilości punktów- powiadomienie o błędzie
                     {
-                        ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
+                        ViewData["Karty"] = _context.LoyalityCard.ToList();
+                        ViewData["Produkty"] = _context.Product.ToList();
+                        ViewData["Klienci"] = _context.Client.ToList();
+                        ViewData["Samochody"] = _context.Car.ToList();
                         ViewData["Error"] = "This card doesn't have enough points to pay for this transaction";
                         return View("AddTransaction", transactionModel);
                     }
@@ -183,9 +186,15 @@ namespace PetrolStation.Controllers
 
             if (transactionModel.IsInvoice) //faktura
             {
-
-
+                TransactionInvoice transactionInvoice = new TransactionInvoice
+                {
+                    IdTransaction = thisTransaction.IdTransaction,
+                    IdClient = transactionModel.client.IdClient,
+                    IdCar = transactionModel.clientCar.IdCar
+                };
+                _context.Add(transactionInvoice);
             }
+            await _context.SaveChangesAsync();
             return View("AddTransaction", transactionModel);
         }
     }

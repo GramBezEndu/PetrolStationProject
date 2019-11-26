@@ -28,15 +28,31 @@ namespace PetrolStation.Controllers
             foreach(var t in transactions)
             {
                 var actualExtendedTransaction = new ExtendedTransactionModel();
-                //assign transaction and client
+                //assign transaction
                 actualExtendedTransaction.Transaction = t;
+                //assign transaction type
+                if (actualExtendedTransaction.Transaction is TransactionInvoice)
+                    actualExtendedTransaction.IsInvoice = true;
                 //assign loyality card
                 actualExtendedTransaction.LoyalityCard = _context.LoyalityCard.Where(x => x.IdLoyalityCard == t.IdLoyalityCard).FirstOrDefault();
-                //assign client
-                if(actualExtendedTransaction.LoyalityCard != null)
+                //Inny klient moze byc na karcie lojalnościowej i na fakturze, ale musi być jakiś
+                if (actualExtendedTransaction.Transaction is TransactionInvoice transactionInvoice)
                 {
-                    actualExtendedTransaction.Client = _context.Client.Where(x => x == actualExtendedTransaction.LoyalityCard.Client).FirstOrDefault();
+                    actualExtendedTransaction.Client = _context.Client.Where(x => x.IdClient == transactionInvoice.IdClient).ToList()[0];
                 }
+                //wlasciciel karty
+                if (actualExtendedTransaction.LoyalityCard != null)
+                {
+                    actualExtendedTransaction.LoyalityCardOwner = _context.Client.Where(x => x.IdClient == actualExtendedTransaction.LoyalityCard.IdClient).FirstOrDefault();
+                }
+                ////assign client
+                //if (actualExtendedTransaction.LoyalityCard != null)
+                //{
+                //    else
+                //    {
+                //        actualExtendedTransaction.LoyalityCardOwner = _context.Client.Where(x => x.IdClient == actualExtendedTransaction.LoyalityCard.IdClient).FirstOrDefault();
+                //    }
+                //}
                 //assign car if there is an assigned client (if nie potrzebny chyba)
                 var car = _context.Car.Where(x => x.Client == actualExtendedTransaction.Client).FirstOrDefault();
                 actualExtendedTransaction.Car = car;

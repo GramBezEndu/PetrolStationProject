@@ -3,27 +3,35 @@
 
 @{
     ViewData["Title"] = "Index";
+    <select id="TypeList">
+        <option>Transaction</option>
+        <option>Transaction Invoice</option>
+        <option>All</option>
+    </select>
 }
 
 <h1>Transactions</h1>
 <table class="table" id="MainTable">
     <thead>
         <tr>
-            <th scope="col">Details</th>
+            <th scope="col"></th>
             <th scope="col">Id transaction</th>
             <th scope="col">Transaction date</th>
             <th scope="col" @*hidden*@>Client Id</th>
+            <th scope="col" @*hidden*@>Locality</th>
+            <th scope="col" @*hidden*@>Street</th>
             <th scope="col" @*hidden*@>Car</th>
             <th scope="col" @*hidden*@>Fueling list</th>
             <th scope="col" @*hidden*@>Purchased products</th>
-            <th scope="col">Loyality card</th>
+            <th scope="col">Loyality card Id</th>
+            <th scope="col">Loyality card owner Id</th>
             <th scope="col">Loyality card actual points</th>
         </tr>
         @foreach (var extendedTransaction in Model)
         {
     <tr>
         <td>
-            <button class="details">Show</button>
+            <button class="details">></button>
         </td>
         <td>
             @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
@@ -33,6 +41,12 @@
         </td>
         <td @*hidden*@>
             @Html.DisplayFor(modelItem => extendedTransaction.Client.IdClient)
+        </td>
+        <td @*hidden*@>
+            @Html.DisplayFor(modelItem => extendedTransaction.Client.Locality)
+        </td>
+        <td @*hidden*@>
+            @Html.DisplayFor(modelItem => extendedTransaction.Client.Street)
         </td>
         <td @*hidden*@>
             @Html.DisplayFor(modelItem => extendedTransaction.Car)
@@ -110,6 +124,9 @@
         </td>
         <td @*hidden*@>
             @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
         </td>
         <td @*hidden*@>
             @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)

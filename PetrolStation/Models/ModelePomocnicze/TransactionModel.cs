@@ -8,10 +8,7 @@ namespace PetrolStation.Models.ModelePomocnicze
     public class TransactionModel
     {
         public String boughtString { get; set; }
-        public List<ProductQuantity> purchasedProducts { get; set; } = new List<ProductQuantity>();
         public List<FuelingModel> purchasedFueling { get; set; } = new List<FuelingModel>();
-        public string NamePurchasedProduct { get; set; }
-        public int QuantityPurchasedProduct { get; set; }
         public decimal TransactionValue { get; set; }
         public bool IsInvoice { get; set; }
         public bool CardPayment { get; set; }

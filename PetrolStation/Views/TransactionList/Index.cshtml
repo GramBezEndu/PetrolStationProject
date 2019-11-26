@@ -25,7 +25,7 @@
         {
             <tr>
                 <td>
-                    <button class="details">></button>
+                    <button class="DetailsButton">></button>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
@@ -42,122 +42,124 @@
                 <td>
                     @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
                 </td>
-                </tr>
+            </tr>
+        }
+        </thead>
+    <tbody>
+        @foreach (var extendedTransaction in Model)
+        {
+            <tr>
                 @*Fueling list*@
-    <tr>
-        @if (extendedTransaction.FuelingList.Count > 0)
-        {
-            <td colspan="6">
-                <h4>Fueling list</h4>
-                <table>
-                    <tr>
-                        <th scope="col">Id fueling</th>
-                        <th scope="col">Id gas pump</th>
-                        <th scope="col">Fuel name</th>
-                        <th scope="col">Price per liter</th>
-                        <th scope="col">Fuel quantity</th>
-                        <th scope="col">Price total</th>
-                    </tr>
-                    @foreach (var fueling in extendedTransaction.FuelingList)
-                    {
-                        //Zastanowic sie czy tak chcemy zaokraglac
-                        decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
-                        <tr @*hidden*@>
-                            <td>
-                                @Html.DisplayFor(modelItem => fueling.IdFueling)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
-                            </td>
-                            <td>
-                                @priceTotal
-                            </td>
-                        </tr>
-                    }
-                </table>
-            </td>
-        }
-    </tr>
-    <tr>
-        @*Product list*@
-        @if (extendedTransaction.PurchasedProducts.Count > 0)
-        {
-        <td colspan="6">
-            <h4>Products list</h4>
-            <table>
-                <tr>
-                    <th scope="col">Id product</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Price per unit</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Price sum</th>
-                </tr>
-                @foreach (var product in extendedTransaction.PurchasedProducts)
+                @if (extendedTransaction.FuelingList.Count > 0)
                 {
-                    decimal priceSum = product.Quantity * product.Product.Price;
-                    <tr @*hidden*@>
-                        <td>
-                            @Html.DisplayFor(modelItem => product.IdProduct)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => product.Product.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => product.Product.Price)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => product.Quantity)
-                        </td>
-                        <td>
-                            @priceSum
-                        </td>
-                    </tr>
+                    <td colspan="6">
+                        <h4>Fueling list</h4>
+                        <table>
+                            <tr>
+                                <th scope="col">Id fueling</th>
+                                <th scope="col">Id gas pump</th>
+                                <th scope="col">Fuel name</th>
+                                <th scope="col">Price per liter</th>
+                                <th scope="col">Fuel quantity</th>
+                                <th scope="col">Price total</th>
+                            </tr>
+                            @foreach (var fueling in extendedTransaction.FuelingList)
+                            {
+                                //Zastanowic sie czy tak chcemy zaokraglac
+                                decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
+                                <tr @*hidden*@>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.IdFueling)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
+                                    </td>
+                                    <td>
+                                        @priceTotal
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
                 }
-            </table>
-        </td>
+            </tr>
+            <tr>
+                @*Product list*@
+                @if (extendedTransaction.PurchasedProducts.Count > 0)
+                {
+                    <td colspan="6">
+                        <h4>Products list</h4>
+                        <table>
+                            <tr>
+                                <th scope="col">Id product</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price per unit</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Price sum</th>
+                            </tr>
+                            @foreach (var product in extendedTransaction.PurchasedProducts)
+                            {
+                                decimal priceSum = product.Quantity * product.Product.Price;
+                                <tr @*hidden*@>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.IdProduct)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Product.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Product.Price)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Quantity)
+                                    </td>
+                                    <td>
+                                        @priceSum
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @if (extendedTransaction.LoyalityCard != null)
+                {
+                    <td colspan="6">
+                        <table>
+                            <tr>
+                                <th scope="col">Card ID</th>
+                                <th scope="col">Owner ID</th>
+                                <th scope="col">Points on card</th>
+                            </tr>
+                            <tr>
+                                <td @*hidden*@>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
+                                </td>
+                                <td @*hidden*@>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                }
+            </tr>
         }
-    </tr>
-    <tr>
-        @if (extendedTransaction.LoyalityCard != null)
-        {
-            <td colspan="6">
-                <table>
-                    <tr>
-                        <th scope="col">Card ID</th>
-                        <th scope="col">Owner ID</th>
-                        <th scope="col">Points on card</th>
-                    </tr>
-                    <tr>
-                        <td @*hidden*@>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
-                        </td>
-                        <td @*hidden*@>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        }
-    </tr>
-        }
-    </thead>
+    </tbody>
 </table>
 <script>
     var table = document.getElementById("MainTable");
-    //for (let i = 0; i < table.rows; i++)
-    //{
-    //    var detailsButton =
-    //}
+    var detailsButtons = document.getElementsByClassName("DetailsButton");
 </script>

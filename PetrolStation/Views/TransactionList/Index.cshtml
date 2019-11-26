@@ -21,145 +21,303 @@
             <th scope="col">Transaction sum</th>
             <th scope="col">Transaction type</th>
         </tr>
-        @foreach (var extendedTransaction in Model)
-        {
-            <tr>
-                <td>
-                    <button class="DetailsButton">></button>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => extendedTransaction.ClientString)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => extendedTransaction.Transaction.Date)
-                </td>
-                <td>
-                    Not calculated
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
-                </td>
-            </tr>
-        }
         </thead>
-    <tbody>
         @foreach (var extendedTransaction in Model)
         {
-            <tr>
-                @*Fueling list*@
-                @if (extendedTransaction.FuelingList.Count > 0)
-                {
-                    <td colspan="6">
-                        <h4>Fueling list</h4>
-                        <table>
-                            <tr>
-                                <th scope="col">Id fueling</th>
-                                <th scope="col">Id gas pump</th>
-                                <th scope="col">Fuel name</th>
-                                <th scope="col">Price per liter</th>
-                                <th scope="col">Fuel quantity</th>
-                                <th scope="col">Price total</th>
-                            </tr>
-                            @foreach (var fueling in extendedTransaction.FuelingList)
-                            {
-                                //Zastanowic sie czy tak chcemy zaokraglac
-                                decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
-                                <tr @*hidden*@>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => fueling.IdFueling)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
-                                    </td>
-                                    <td>
-                                        @priceTotal
-                                    </td>
-                                </tr>
-                            }
-                        </table>
-                    </td>
-                }
-            </tr>
-            <tr>
-                @*Product list*@
-                @if (extendedTransaction.PurchasedProducts.Count > 0)
-                {
-                    <td colspan="6">
-                        <h4>Products list</h4>
-                        <table>
-                            <tr>
-                                <th scope="col">Id product</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Price per unit</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col">Price sum</th>
-                            </tr>
-                            @foreach (var product in extendedTransaction.PurchasedProducts)
-                            {
-                                decimal priceSum = product.Quantity * product.Product.Price;
-                                <tr @*hidden*@>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => product.IdProduct)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => product.Product.Name)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => product.Product.Price)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => product.Quantity)
-                                    </td>
-                                    <td>
-                                        @priceSum
-                                    </td>
-                                </tr>
-                            }
-                        </table>
-                    </td>
-                }
-            </tr>
-            <tr>
-                @if (extendedTransaction.LoyalityCard != null)
-                {
-                    <td colspan="6">
-                        <table>
-                            <tr>
-                                <th scope="col">Card ID</th>
-                                <th scope="col">Owner ID</th>
-                                <th scope="col">Points on card</th>
-                            </tr>
-                            <tr>
-                                <td @*hidden*@>
-                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+            string transactionType = "Not assigned - error";
+            if (extendedTransaction.IsInvoice)
+                transactionType = "Invoice";
+            else
+                transactionType = "Transaction";
+    <tbody class="AlwaysVisible" title="@transactionType">
+        <tr>
+            <td>
+                <button class="DetailsButton">></button>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => extendedTransaction.ClientString)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => extendedTransaction.Transaction.Date)
+            </td>
+            <td>
+                Not calculated
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
+            </td>
+        </tr>
+    </tbody>
+    <tbody class="DetailsInfo" hidden title="@transactionType">
+        <tr>
+            @*Fueling list*@
+            @if (extendedTransaction.FuelingList.Count > 0)
+            {
+                <td colspan="6">
+                    <h4>Fueling list</h4>
+                    <table>
+                        <tr>
+                            <th scope="col">Id fueling</th>
+                            <th scope="col">Id gas pump</th>
+                            <th scope="col">Fuel name</th>
+                            <th scope="col">Price per liter</th>
+                            <th scope="col">Fuel quantity</th>
+                            <th scope="col">Price total</th>
+                        </tr>
+                        @foreach (var fueling in extendedTransaction.FuelingList)
+                        {
+                            //Zastanowic sie czy tak chcemy zaokraglac
+                            decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
+                            <tr @*hidden*@>
+                                <td>
+                                    @Html.DisplayFor(modelItem => fueling.IdFueling)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
+                                    @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
                                 </td>
-                                <td @*hidden*@>
-                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
+                                <td>
+                                    @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
+                                </td>
+                                <td>
+                                    @priceTotal
                                 </td>
                             </tr>
-                        </table>
-                    </td>
-                }
-            </tr>
-        }
+                        }
+                    </table>
+                </td>
+            }
+        </tr>
+        <tr>
+            @*Product list*@
+            @if (extendedTransaction.PurchasedProducts.Count > 0)
+            {
+                <td colspan="6">
+                    <h4>Products list</h4>
+                    <table>
+                        <tr>
+                            <th scope="col">Id product</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Price per unit</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Price sum</th>
+                        </tr>
+                        @foreach (var product in extendedTransaction.PurchasedProducts)
+                        {
+                            decimal priceSum = product.Quantity * product.Product.Price;
+                            <tr @*hidden*@>
+                                <td>
+                                    @Html.DisplayFor(modelItem => product.IdProduct)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => product.Product.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => product.Product.Price)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => product.Quantity)
+                                </td>
+                                <td>
+                                    @priceSum
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+            }
+        </tr>
+        <tr>
+            @if (extendedTransaction.LoyalityCard != null)
+            {
+                <td colspan="6">
+                    <table>
+                        <tr>
+                            <th scope="col">Card ID</th>
+                            <th scope="col">Owner ID</th>
+                            <th scope="col">Points on card</th>
+                        </tr>
+                        <tr>
+                            <td @*hidden*@>
+                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
+                            </td>
+                            <td @*hidden*@>
+                                @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            }
+        </tr>
     </tbody>
+        }
 </table>
 <script>
-    var table = document.getElementById("MainTable");
-    var detailsButtons = document.getElementsByClassName("DetailsButton");
+    window.onload = function()
+    {
+        //Toggle detials section
+        var table = document.getElementById("MainTable");
+        var detailsButtons = document.getElementsByClassName("DetailsButton");
+        var detailsInfo = document.getElementsByClassName("DetailsInfo");
+
+        console.log("[DEBUG] Details buttons count: " + detailsButtons.length);
+        console.log("[DEBUG] Details tbody count: " + detailsInfo.length);
+
+        document.onclick = function(event)
+        {
+            if (window.event)
+            {
+                //assign the element clicked to e (IE 6-8)
+                e = event.srcElement;
+            }
+            else
+            {
+                //assign the element clicked to e
+                e = e.target;
+            }
+
+            if (e.className && e.className.indexOf('DetailsButton') != -1)
+            {
+                //if the element has a class name, and that is 'someclass' then...
+                let index = -1;
+                for (let i = 0; i < detailsButtons.length; i++)
+                {
+                    if (detailsButtons[i] === e)
+                        index = i;
+                }
+                detailsInfo[index].hidden = !(detailsInfo[index].hidden);
+            }
+        }
+        //Transaction Type section
+        var typeList = document.getElementById("TypeList");
+        var x = document.getElementsByClassName("AlwaysVisible");
+        var y = document.getElementsByClassName("DetailsInfo");
+        console.log("[DEBUG] On load: x(rows) count " + x.length);
+        console.log("[DEBUG] On load: y(rows) count " + y.length);
+
+        //On document load -> title of transaction and hide if nedded
+        //We use tbody.title to determine transaction type
+        if (typeList.value == "Transaction")
+        {
+            console.log("[DEBUG] On load: showing only transactions (paragony)!")
+
+            //Same length for x and y
+            for (let i = 0; i < x.length; i++)
+            {
+                //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                if (x[i].title == "Invoice")
+                {
+                    x[i].hidden = true;
+                    y[i].hidden = true;
+                }
+            }
+        }
+        else if (typeList.value == "Invoice")
+        {
+            console.log("[DEBUG] On load: showing only invoices (faktury)!")
+            //Same length for x and y
+            for (let i = 0; i < x.length; i++)
+            {
+                //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                if (x[i].title == "Transaction")
+                {
+                    x[i].hidden = true;
+                    y[i].hidden = true;
+                }
+            }
+        }
+        //Do not need to hide anything -> everything visible on default
+        else
+        {
+            console.log("[DEBUG] On load: showing all transactions!")
+        }
+
+        //Transaction type change section -> change hidden
+        typeList.onchange = function(event)
+        {
+            var value = event.target.value;
+            console.log("[DEBUG] NOW SHOWING ONLY TRANSACTIONS OF TYPE " + value);
+            if (value == "Transaction")
+            {
+                //Show transactions
+                for (let i = 0; i < x.length; i++)
+                {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Transaction")
+                    {
+                        x[i].hidden = false;
+                        y[i].hidden = false;
+                    }
+                }
+                //Hide invoices
+                for (let i = 0; i < x.length; i++) {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Invoice") {
+                        x[i].hidden = true;
+                        y[i].hidden = true;
+                    }
+                }
+            }
+            else if (value == "Transaction Invoice")
+            {
+                //Hide transactions
+                for (let i = 0; i < x.length; i++)
+                {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Transaction")
+                    {
+                        x[i].hidden = true;
+                        y[i].hidden = true;
+                    }
+                }
+                //Show invoices
+                for (let i = 0; i < x.length; i++)
+                {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Invoice")
+                    {
+                        x[i].hidden = false;
+                        y[i].hidden = false;
+                    }
+                }
+            }
+            else if (value == "All")
+            {
+                //Show transactions
+                for (let i = 0; i < x.length; i++)
+                {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Transaction")
+                    {
+                        x[i].hidden = false;
+                        y[i].hidden = false;
+                    }
+                }
+                //Show invoices
+                for (let i = 0; i < x.length; i++)
+                {
+                    //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
+                    if (x[i].title == "Invoice")
+                    {
+                        x[i].hidden = false;
+                        y[i].hidden = false;
+                    }
+                }
+            }
+            else
+                throw "Invalid transaction type selected!";
+        }
+    }
+
 </script>

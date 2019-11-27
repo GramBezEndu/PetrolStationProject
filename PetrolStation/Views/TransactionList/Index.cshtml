@@ -45,7 +45,7 @@
                 @Html.DisplayFor(modelItem => extendedTransaction.Transaction.Date)
             </td>
             <td>
-                Not calculated
+                @extendedTransaction.PriceWholeTransaction
             </td>
             <td>
                 @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
@@ -202,6 +202,40 @@
                                 if (property.Name != "IdClient")
                                 {
                                     <td scope="col">@property.GetValue(extendedTransaction.LoyalityCardOwner)</td>
+                                }
+                            }
+                        }
+                    </tr>
+                </table>
+            </td>
+            }
+        </tr>
+        <tr>
+            @if(extendedTransaction.Car != null)
+            {
+            <td colspan="6">
+                <h4>Used car</h4>
+                <table>
+                    <tr>
+                        @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
+                        {
+                            if (property.GetValue(extendedTransaction.Car) != null)
+                            {
+                                if (property.Name != "Client")
+                                {
+                                    <th scope="col">@property.Name</th>
+                                }
+                            }
+                        }
+                    </tr>
+                    <tr>
+                        @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
+                        {
+                            if (property.GetValue(extendedTransaction.Car) != null)
+                            {
+                                if (property.Name != "Client")
+                                {
+                                    <td>@property.GetValue(extendedTransaction.Car)</td>
                                 }
                             }
                         }

@@ -44,7 +44,7 @@ namespace PetrolStation.Controllers
                 if (actualExtendedTransaction.LoyalityCard != null)
                 {
                     actualExtendedTransaction.LoyalityCardOwner = _context.Client.Where(x => x.IdClient == actualExtendedTransaction.LoyalityCard.IdClient).FirstOrDefault();
-                    //case: There is no client - assign client = cardOwner
+                    //case: There is no client -> assign client = cardOwner
                     if(actualExtendedTransaction.Client == null)
                     {
                         actualExtendedTransaction.Client = actualExtendedTransaction.LoyalityCardOwner;
@@ -58,9 +58,11 @@ namespace PetrolStation.Controllers
                 //        actualExtendedTransaction.LoyalityCardOwner = _context.Client.Where(x => x.IdClient == actualExtendedTransaction.LoyalityCard.IdClient).FirstOrDefault();
                 //    }
                 //}
-                //assign car if there is an assigned client (if nie potrzebny chyba)
-                var car = _context.Car.Where(x => x.Client == actualExtendedTransaction.Client).FirstOrDefault();
-                actualExtendedTransaction.Car = car;
+                //assign used car in transaction (Invoice only)
+                if(actualExtendedTransaction.Transaction is TransactionInvoice transactionInvoice1)
+                {
+                    actualExtendedTransaction.Car = _context.Car.Where(x => x.Client == transactionInvoice1.Client).FirstOrDefault();
+                }
                 //assign fueling list
                 actualExtendedTransaction.FuelingList = _context.FuelingList.Where(x => x.Transaction == actualExtendedTransaction.Transaction).ToList();
                 foreach(var fuelingItem in actualExtendedTransaction.FuelingList)

@@ -47,5 +47,21 @@ namespace PetrolStation.Models.ModelePomocnicze
                     return "Transaction";
             }
         }
+        public decimal PriceWholeTransaction
+        {
+            get
+            {
+                decimal priceTotal = 0;
+                foreach(var p in PurchasedProducts)
+                {
+                    priceTotal += p.Quantity * p.Product.Price;
+                }
+                foreach(var f in FuelingList)
+                {
+                    priceTotal += Math.Round(f.Fueling.Fuel.PriceForLiter * (decimal)(f.Fueling.Quantity), 2);
+                }
+                return priceTotal;
+            }
+        }
     }
 }

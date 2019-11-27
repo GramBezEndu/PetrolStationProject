@@ -54,6 +54,34 @@
     </tbody>
     <tbody class="DetailsInfo" hidden title="@transactionType">
         <tr>
+            @if(extendedTransaction.Client != null)
+            {
+                <td colspan="6">
+                    <h4>Client</h4>
+                    <table>
+                        <tr>
+                            @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
+                            {
+                                if (property.GetValue(extendedTransaction.Client) != null)
+                                {
+                                    <th scope="col">@property.Name</th>
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
+                            {
+                                if (property.GetValue(extendedTransaction.Client) != null)
+                                {
+                                    <td>@property.GetValue(extendedTransaction.Client)</td>
+                                }
+                            }
+                        </tr>
+                    </table>
+                </td>
+            }
+        </tr>
+        <tr>
             @*Fueling list*@
             @if (extendedTransaction.FuelingList.Count > 0)
             {
@@ -167,13 +195,13 @@
                         <td>
                             @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
                         </td>
-                        @foreach (var property in extendedTransaction.LoyalityCard.Client.GetType().GetProperties())
+                        @foreach (var property in extendedTransaction.LoyalityCardOwner.GetType().GetProperties())
                         {
-                            if (property.GetValue(extendedTransaction.LoyalityCard.Client) != null)
+                            if (property.GetValue(extendedTransaction.LoyalityCardOwner) != null)
                             {
                                 if (property.Name != "IdClient")
                                 {
-                                    <td scope="col">@property.GetValue(extendedTransaction.LoyalityCard.Client)</td>
+                                    <td scope="col">@property.GetValue(extendedTransaction.LoyalityCardOwner)</td>
                                 }
                             }
                         }

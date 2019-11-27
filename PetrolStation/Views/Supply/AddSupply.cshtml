@@ -65,6 +65,7 @@ input[type=submit] {
             <th scope="col">Quantity in storage</th>
             <th scope="col">Quantity in supply</th>
             <th scope="col">Total quantity</th>
+            <th scope="col">Remove</th>
         </tr>
         <tbody id="supply_table">
 
@@ -74,12 +75,22 @@ input[type=submit] {
     <div class="autocomplete">
     <label>Produkt</label>
     <input id="product_id" />
+        <label>Ilość</label>
+        <input id="ilosc_dostawy" />
     <input type="button" id="add_product" value="Dodaj produkt"/>
         </div>
 </form>
 
 
 <script>
+
+    class Supply {
+        constructor(id, ilosc) {
+            this.id = parseInt(id);
+            this.ilosc = ilosc;
+        }
+    }
+
     let product_button = document.getElementById("add_product")
     let product_input = document.getElementById("product_id");
     let produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
@@ -96,18 +107,26 @@ input[type=submit] {
     }
 
     var IdDodanegoProduktu = -1;
+    document.getElementById("ilosc_dostawy").value = "1";
 
     product_button.addEventListener("click", function (e) {
         let product;
         for (let i = 0; i < productList.length; i++) {
             if (productList[i].IdProduct == IdDodanegoProduktu) {
                 product = productList[i];
+                break;
             }
         }
-
-        if (IdDodanegoProduktu != -1) {
-            createElement(product.IdProduct, product.Name, product.QuantityInStorage,22);
-            IdDodanegoProduktu = -1;
+        console.log(product);
+        console.log(document.getElementById("product_id").value)
+        console.log(productsAddedToSupplyContains(product));
+        if (IdDodanegoProduktu != -1 && document.getElementById("product_id").value == product.Name) {
+            if (!productsAddedToSupplyContains(product)) {
+                createElement(product.IdProduct, product.Name, product.QuantityInStorage, parseInt(document.getElementById("ilosc_dostawy").value));
+                productsAddedToSupply.push(new Supply(product.IdProduct, parseInt(document.getElementById("ilosc_dostawy").value)));
+                IdDodanegoProduktu = -1;
+                document.getElementById("ilosc_dostawy").value = "1";
+            }
         }
     });
 
@@ -142,12 +161,12 @@ input[type=submit] {
           b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
           b.innerHTML += arr[i].substr(val.length);
             /*insert a input field that will hold the current array item's value:*/
-            b.innerHTML += "<input type='hidden' value='" + productList[i].Name + "'>";
-            IdDodanegoProduktu = parseInt(productList[i].IdProduct);
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
+            b.addEventListener("click", function (e) {
+                IdDodanegoProduktu = parseInt(this.getElementsByTagName("input")[0].value.split(" ")[0]);
+                /*insert the value for the autocomplete text field:*/
+                inp.value = productNameForId(IdDodanegoProduktu);
               /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
               closeAllLists();
@@ -229,6 +248,47 @@ document.addEventListener("click", function (e) {
         newTd.appendChild(tekst);
         newTr.appendChild(newTd);
 
+
+        newTd = document.createElement("td");
+        let removeButton = document.createElement("input");
+        removeButton.type = "button";
+        removeButton.value = "REMOVE";
+        removeButton.onclick = function () {
+            document.getElementById("tr" + id).remove();
+            for (let i = 0; i < productsAddedToSupply.length; i++) {
+                if (productsAddedToSupply[i].id == id) {
+                    let remove = productsAddedToSupply.splice(i, 1);
+                    document.getElementById("product_id").value = "";
+                    break;
+                }
+            }
+
+        };
+        newTd.appendChild(removeButton);
+        newTr.appendChild(newTd);
+
+        newTr.setAttribute("id", "tr" + id);
         parent.appendChild(newTr);
     }
+
+    function productsAddedToSupplyContains(product) {
+        if (product == null) {
+            return true;
+        }
+        for (let i = 0; i < productsAddedToSupply.length; i++) {
+            if (productsAddedToSupply[i].id == product.IdProduct) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function productNameForId(id) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].IdProduct == id) {
+                return productList[i].Name;
+            }
+        }
+    }
+
 </script>

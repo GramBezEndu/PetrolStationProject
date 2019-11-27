@@ -58,6 +58,7 @@ input[type=submit] {
 
 <h1>AddSupply</h1>
 <form asp-action="AddSupply" id="form" autocomplete="off">
+    <div style='overflow:auto; width:1000px;height:300px;'>
     <table class="table table-striped">
         <tr>
             <th scope="col">Id</th>
@@ -71,13 +72,14 @@ input[type=submit] {
 
         </tbody>
     </table>
+        </div>
     <br />
     <div class="autocomplete">
     <label>Produkt</label>
     <input id="product_id" />
         <label>Ilość</label>
         <input id="ilosc_dostawy" />
-    <input type="button" id="add_product" value="Dodaj produkt"/>
+    <input type="button" id="add_product" value="Dodaj produkt" class="btn btn-primary"/>
         </div>
 </form>
 
@@ -252,7 +254,8 @@ document.addEventListener("click", function (e) {
         newTd = document.createElement("td");
         let removeButton = document.createElement("input");
         removeButton.type = "button";
-        removeButton.value = "REMOVE";
+        removeButton.setAttribute("class", "btn btn-danger");
+        removeButton.value = "Usuń";
         removeButton.onclick = function () {
             document.getElementById("tr" + id).remove();
             for (let i = 0; i < productsAddedToSupply.length; i++) {

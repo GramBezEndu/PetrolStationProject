@@ -36,9 +36,22 @@
         text-align: center;
     }
 
+    table.scroll tbody th:nth-child(4) {
+        padding-bottom: 0;
+    }
+
+    table.scroll tbody th:nth-child(4) input {
+        display: inline-block;
+        width: 30%;
+    }
+
     table.scroll tbody th:last-child {
         padding-top: calc(.75rem - 7px);
         padding-bottom: calc(.75rem - 7px);
+    }
+
+    table.scroll p {
+        margin: 0;
     }
 
 
@@ -205,7 +218,7 @@
                         <td>@Model.purchasedFueling[i].fueling.Quantity</td>
                         <td>@Model.purchasedFueling[i].fueling.Fuel.PriceForLiter</td>
                         <td>@Model.purchasedFueling[i].VelueOfFueling</td>
-                        <td><input type="checkbox" asp-for="@Model.purchasedFueling[i].IsChecked"  /></td>
+                        <td><input type="checkbox" asp-for="@Model.purchasedFueling[i].IsChecked" onclick="updateBought()" /></td>
                     </tr>
                 }
             }
@@ -245,7 +258,7 @@
             <br/><br/>
             <div class="width50L">
                 <div class="autofill">
-                    <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Numer karty stałego klienta">
+                    <input id="card_id" class="form-control" placeholder="Numer karty stałego klienta">
                 </div>
                 <input type="checkbox" asp-for="@Model.CardPayment" disabled ="disabled"/>
                 <label>Płatność punktami</label>
@@ -259,7 +272,7 @@
 
             <div id="invoice" class="width50R" hidden="hidden">
                 <div class="autofill">
-                    <input id="client_id" class="form-control" placeholder="Wyszukiwanie">
+                    <input id="client_id" class="form-control" placeholder="Wyszukiwanie klienta">
                 </div>
                 <br/><br/>
                 <input id="name" class="form-control" placeholder="Nazwa">
@@ -398,6 +411,10 @@
 
         getNumbers() {
             return this.numbers;
+        }
+
+        setNumber(index, value) {
+            this.numbers[index] = value;
         }
 
         getProduct(x) {
@@ -546,6 +563,8 @@
     let card_input = document.getElementById("card_id");
     let car_input;
     let client_input = document.getElementById("client_id");
+    let fuellings = document.getElementsByTagName("table")[0].getElementsByTagName("input");
+
 
     let submit_button = document.getElementById("send");
 
@@ -561,7 +580,7 @@
 
     product_button.addEventListener("click", function (e) {
         if (!product_input.value) return;
-        if (product_input.data) {
+        if (product_input.data != null) {
             bought.addProduct(available.getProduct(product_input.data));
             product_input.data = null;
         } else {
@@ -618,11 +637,34 @@
             record.push(products[products.length - 1 - i].name.toString());
             record.push(products[products.length - 1 - i].price.toFixed(2));
             record.push(numbers[products.length - 1 - i].toFixed(2));
-            record.push((Math.round((record[2] * record[3] * 100) / 100)).toFixed(2));
-            for (let j of record) {
+            record.push((Math.round(record[2] * record[3] * 100) / 100).toFixed(2));
+            for (let j = 0; j < record.length; j++) {
                 cell = document.createElement("th");
-                console.log(j);
-                cell.innerHTML = j;
+                if (j == 3) {
+                    let p = document.createElement("p");
+                    p.innerHTML = record[j];
+                    p.addEventListener("click", function (e) {
+                        let saved = body.getElementsByTagName("tr")[i].getElementsByTagName("th")[3];
+                        saved.innerHTML = "";
+                        let input = document.createElement("input");
+                        input.value = p.innerHTML;
+                        input.addEventListener("focusout", function (e) {
+                            if (validate(input.value)) {
+                                bought.setNumber(products.length - 1 - i, parseFloat(input.value))
+                                updateBought();
+                            } else {
+                                this.focus();
+                                // jakiś alert
+                            }
+                        });
+                        saved.appendChild(input);
+                        input.focus();
+                    });
+                    cell.appendChild(p);
+                } else {
+                    cell.innerHTML = record[j];
+                }
+                console.log(record[j]);
                 row.appendChild(cell);
             }
             cell = document.createElement("th");
@@ -643,7 +685,36 @@
         for (let i = 0; i < 4; i++) {
             row.appendChild(document.createElement("th"));
         }
-        document.getElementById("sum").innerText = (bought.getTotal().toFixed(2));
+        let total = bought.getTotal();
+        total += fuelling();
+        document.getElementById("sum").innerText = (total.toFixed(2));
+    }
+
+    function fuelling() {
+        let price = 0;
+        let checkboxes = document.getElementsByTagName("table")[0].getElementsByTagName("input");
+        for (let checkbox of checkboxes) {
+            if (checkbox.checked) {
+                let parent = checkbox.parentNode.parentNode;
+                price += parseFloat(parent.getElementsByTagName("td")[4].innerHTML);
+            }
+        }
+        return price;
+    }
+
+    function validate(value) {
+        if (isNaN(value))
+        {
+            return false;
+        }
+        if (value.length == 0) {          
+            return false;
+        }
+        if (value < 0)
+        {
+            return false;
+        }
+        return true;
     }
 
     function autofill(input, object) {
@@ -653,9 +724,7 @@
         let highlighted;
 
         input.addEventListener("input", function (e) {
-            if (this.id == "product_id") {
-                this.data = null;
-            }
+            this.data = null;
             closeLists();
             let value = this.value;
             let x, y;
@@ -675,23 +744,36 @@
                 switch (this.id) {
                     case "product_id":
                         y.addEventListener("click", function (e) {
-                            input.data = i;
                             input.value = object_list[i]["name"];
+                            input.data = i;
                         });
                         break;
                     case "card_id":
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["id"];
+                            input.data = object_list[i]["id"];
                         });
                         break;
                     case "car_id":
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["plate"];
+                            input.data = object_list[i]["id"];
                         });
                         break;
                     case "client_id":
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["id"];
+                            input.data = object_list[i]["id"];
+                            document.getElementById("name").value = object_list[i]["name"];
+                            document.getElementById("nip").value = object_list[i]["nip"];
+                            document.getElementById("first_name").value = object_list[i]["firstName"];
+                            document.getElementById("surname").value = object_list[i]["surname"];
+                            document.getElementById("street").value = object_list[i]["street"];
+                            document.getElementById("house_number").value = object_list[i]["houseNumber"];
+                            document.getElementById("apartment_number").value = object_list[i]["apartmentNumber"];
+                            document.getElementById("postal_code").value = object_list[i]["postalCode"];
+                            document.getElementById("city").value = object_list[i]["city"];
+
                         });
                     default:
                         break;

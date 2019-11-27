@@ -1,5 +1,5 @@
 ﻿@model List<PetrolStation.Models.ModelePomocnicze.ExtendedTransactionModel>
-
+@using System.Text.RegularExpressions
 
 @{
     ViewData["Title"] = "Index";
@@ -22,234 +22,254 @@
             <th scope="col">Transaction sum</th>
             <th scope="col">Transaction type</th>
         </tr>
-        </thead>
-        @foreach (var extendedTransaction in Model)
-        {
-            string transactionType = "Not assigned - error";
-            if (extendedTransaction.IsInvoice)
-                transactionType = "Invoice";
-            else
-                transactionType = "Transaction";
-    <tbody class="AlwaysVisible" title="@transactionType">
-        <tr>
-            <td>
-                <button class="DetailsButton">></button>
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => extendedTransaction.ClientString)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => extendedTransaction.Transaction.Date)
-            </td>
-            <td>
-                @extendedTransaction.PriceWholeTransaction
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
-            </td>
-        </tr>
-    </tbody>
-    <tbody class="DetailsInfo" hidden title="@transactionType">
-        <tr>
-            @if(extendedTransaction.Client != null)
-            {
-                <td colspan="6">
-                    <h4>Client</h4>
-                    <table>
-                        <tr>
-                            @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
-                            {
-                                if (property.GetValue(extendedTransaction.Client) != null)
-                                {
-                                    <th scope="col">@property.Name</th>
-                                }
-                            }
-                        </tr>
-                        <tr>
-                            @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
-                            {
-                                if (property.GetValue(extendedTransaction.Client) != null)
-                                {
-                                    <td>@property.GetValue(extendedTransaction.Client)</td>
-                                }
-                            }
-                        </tr>
-                    </table>
+    </thead>
+    @foreach (var extendedTransaction in Model)
+    {
+        string transactionType = "Not assigned - error";
+        if (extendedTransaction.IsInvoice)
+            transactionType = "Invoice";
+        else
+            transactionType = "Transaction";
+        <tbody class="AlwaysVisible" title="@transactionType">
+            <tr>
+                <td>
+                    <button class="DetailsButton">></button>
                 </td>
-            }
-        </tr>
-        <tr>
-            @*Fueling list*@
-            @if (extendedTransaction.FuelingList.Count > 0)
-            {
-                <td colspan="6">
-                    <h4>Fueling list</h4>
-                    <table>
-                        <tr>
-                            <th scope="col">Id fueling</th>
-                            <th scope="col">Id gas pump</th>
-                            <th scope="col">Fuel name</th>
-                            <th scope="col">Price per liter</th>
-                            <th scope="col">Fuel quantity</th>
-                            <th scope="col">Price total</th>
-                        </tr>
-                        @foreach (var fueling in extendedTransaction.FuelingList)
-                        {
-                            //Zastanowic sie czy tak chcemy zaokraglac
-                            decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
-                            <tr @*hidden*@>
-                                <td>
-                                    @Html.DisplayFor(modelItem => fueling.IdFueling)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
-                                </td>
-                                <td>
-                                    @priceTotal
-                                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => extendedTransaction.Transaction.IdTransaction)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => extendedTransaction.ClientString)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => extendedTransaction.Transaction.Date)
+                </td>
+                <td>
+                    @extendedTransaction.PriceWholeTransaction
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => extendedTransaction.TransactionType)
+                </td>
+            </tr>
+        </tbody>
+        <tbody class="DetailsInfo" hidden title="@transactionType">
+            <tr>
+                @if (extendedTransaction.Client != null)
+                {
+                    <td colspan="6">
+                        <h4>Client</h4>
+                        <table>
+                            <tr>
+                                @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
+                                {
+                                    if (property.GetValue(extendedTransaction.Client) != null)
+                                    {
+                                        if (property.Name != "NIP")
+                                        {
+                                            <th scope="col">@Regex.Replace(property.Name, "(\\B[A-Z])", " $1")</th>
+                                        }
+                                        else
+                                        {
+                                            <th scope="col">@property.Name</th>
+                                        }
+                                    }
+                                }
                             </tr>
-                        }
-                    </table>
-                </td>
-            }
-        </tr>
-        <tr>
-            @*Product list*@
-            @if (extendedTransaction.PurchasedProducts.Count > 0)
-            {
-                <td colspan="6">
-                    <h4>Products list</h4>
-                    <table>
-                        <tr>
-                            <th scope="col">Id product</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Price per unit</th>
-                            <th scope="col">Quantity</th>
-                            <th scope="col">Price sum</th>
-                        </tr>
-                        @foreach (var product in extendedTransaction.PurchasedProducts)
-                        {
-                            decimal priceSum = product.Quantity * product.Product.Price;
-                            <tr @*hidden*@>
-                                <td>
-                                    @Html.DisplayFor(modelItem => product.IdProduct)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => product.Product.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => product.Product.Price)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => product.Quantity)
-                                </td>
-                                <td>
-                                    @priceSum
-                                </td>
+                            <tr>
+                                @foreach (var property in extendedTransaction.Client.GetType().GetProperties())
+                                {
+                                    if (property.GetValue(extendedTransaction.Client) != null)
+                                    {
+                                        <td>@property.GetValue(extendedTransaction.Client)</td>
+                                    }
+                                }
                             </tr>
-                        }
-                    </table>
-                </td>
-            }
-        </tr>
-        <tr>
-            @if (extendedTransaction.LoyalityCard != null)
-            {
-            <td colspan="6">
-                <h4>Used loyality card</h4>
-                <table>
-                    <tr>
-                        <th scope="col">Card ID</th>
-                        <th scope="col">Points on card</th>
-                        <th scope="col">Owner ID</th>
-                        @foreach (var property in extendedTransaction.LoyalityCard.Client.GetType().GetProperties())
-                        {
-                            if (property.GetValue(extendedTransaction.LoyalityCard.Client) != null)
+                        </table>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @*Fueling list*@
+                @if (extendedTransaction.FuelingList.Count > 0)
+                {
+                    <td colspan="6">
+                        <h4>Fueling list</h4>
+                        <table>
+                            <tr>
+                                <th scope="col">Id fueling</th>
+                                <th scope="col">Id gas pump</th>
+                                <th scope="col">Fuel name</th>
+                                <th scope="col">Price per liter</th>
+                                <th scope="col">Fuel quantity</th>
+                                <th scope="col">Price total</th>
+                            </tr>
+                            @foreach (var fueling in extendedTransaction.FuelingList)
                             {
-                                if (property.Name != "IdClient")
-                                {
-                                    <th scope="col">@property.Name</th>
-                                }
+                                //Zastanowic sie czy tak chcemy zaokraglac
+                                decimal priceTotal = Math.Round(fueling.Fueling.Fuel.PriceForLiter * (decimal)(fueling.Fueling.Quantity), 2);
+                                <tr @*hidden*@>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.IdFueling)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.IdGasPump)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Fuel.PriceForLiter)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => fueling.Fueling.Quantity)
+                                    </td>
+                                    <td>
+                                        @priceTotal
+                                    </td>
+                                </tr>
                             }
-                        }
-                    </tr>
-                    <tr>
-                        <td @*hidden*@>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
-                        </td>
-                        <td @*hidden*@>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
-                        </td>
-                        @foreach (var property in extendedTransaction.LoyalityCardOwner.GetType().GetProperties())
-                        {
-                            if (property.GetValue(extendedTransaction.LoyalityCardOwner) != null)
+                        </table>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @*Product list*@
+                @if (extendedTransaction.PurchasedProducts.Count > 0)
+                {
+                    <td colspan="6">
+                        <h4>Products list</h4>
+                        <table>
+                            <tr>
+                                <th scope="col">Id product</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Price per unit</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Price sum</th>
+                            </tr>
+                            @foreach (var product in extendedTransaction.PurchasedProducts)
                             {
-                                if (property.Name != "IdClient")
-                                {
-                                    <td scope="col">@property.GetValue(extendedTransaction.LoyalityCardOwner)</td>
-                                }
+                                decimal priceSum = product.Quantity * product.Product.Price;
+                                <tr @*hidden*@>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.IdProduct)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Product.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Product.Price)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => product.Quantity)
+                                    </td>
+                                    <td>
+                                        @priceSum
+                                    </td>
+                                </tr>
                             }
-                        }
-                    </tr>
-                </table>
-            </td>
-            }
-        </tr>
-        <tr>
-            @if(extendedTransaction.Car != null)
-            {
-            <td colspan="6">
-                <h4>Used car</h4>
-                <table>
-                    <tr>
-                        @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
-                        {
-                            if (property.GetValue(extendedTransaction.Car) != null)
-                            {
-                                if (property.Name != "Client")
+                        </table>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @if (extendedTransaction.LoyalityCard != null)
+                {
+                    <td colspan="6">
+                        <h4>Used loyality card</h4>
+                        <table>
+                            <tr>
+                                <th scope="col">Card ID</th>
+                                <th scope="col">Points on card</th>
+                                <th scope="col">Owner ID</th>
+                                @foreach (var property in extendedTransaction.LoyalityCard.Client.GetType().GetProperties())
                                 {
-                                    <th scope="col">@property.Name</th>
+                                    if (property.GetValue(extendedTransaction.LoyalityCard.Client) != null)
+                                    {
+                                        if (property.Name != "IdClient")
+                                        {
+                                            if (property.Name != "NIP")
+                                            {
+                                                <th scope="col">@Regex.Replace(property.Name, "(\\B[A-Z])", " $1")</th>
+                                            }
+                                            else
+                                            {
+                                                <th scope="col">@property.Name</th>
+                                            }
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    </tr>
-                    <tr>
-                        @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
-                        {
-                            if (property.GetValue(extendedTransaction.Car) != null)
-                            {
-                                if (property.Name != "Client")
+                            </tr>
+                            <tr>
+                                <td @*hidden*@>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.IdLoyalityCard)
+                                </td>
+                                <td @*hidden*@>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCard.ActualPoints)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => extendedTransaction.LoyalityCardOwner.IdClient)
+                                </td>
+                                @foreach (var property in extendedTransaction.LoyalityCardOwner.GetType().GetProperties())
                                 {
-                                    <td>@property.GetValue(extendedTransaction.Car)</td>
+                                    if (property.GetValue(extendedTransaction.LoyalityCardOwner) != null)
+                                    {
+                                        if (property.Name != "IdClient")
+                                        {
+                                            <td scope="col">@property.GetValue(extendedTransaction.LoyalityCardOwner)</td>
+                                        }
+                                    }
                                 }
-                            }
-                        }
-                    </tr>
-                </table>
-            </td>
-            }
-        </tr>
-    </tbody>
-        }
+                            </tr>
+                        </table>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @if (extendedTransaction.Car != null)
+                {
+                    <td colspan="6">
+                        <h4>Used car</h4>
+                        <table>
+                            <tr>
+                                @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
+                                {
+                                    if (property.GetValue(extendedTransaction.Car) != null)
+                                    {
+                                        if (property.Name != "Client")
+                                        {
+                                            if (property.Name != "NIP")
+                                            {
+                                                <th scope="col">@Regex.Replace(property.Name, "(\\B[A-Z])", " $1")</th>
+                                            }
+                                            else
+                                            {
+                                                <th scope="col">@property.Name</th>
+                                            }
+                                        }
+                                    }
+                                }
+                            </tr>
+                            <tr>
+                                @foreach (var property in extendedTransaction.Car.GetType().GetProperties())
+                                {
+                                    if (property.GetValue(extendedTransaction.Car) != null)
+                                    {
+                                        if (property.Name != "Client")
+                                        {
+                                            <td>@property.GetValue(extendedTransaction.Car)</td>
+                                        }
+                                    }
+                                }
+                            </tr>
+                        </table>
+                    </td>
+                }
+            </tr>
+        </tbody>
+    }
 </table>
 <script>
-    window.onload = function()
-    {
+    window.onload = function () {
         //Toggle detials section
         var table = document.getElementById("MainTable");
         var detailsButtons = document.getElementsByClassName("DetailsButton");
@@ -258,25 +278,20 @@
         console.log("[DEBUG] Details buttons count: " + detailsButtons.length);
         console.log("[DEBUG] Details tbody count: " + detailsInfo.length);
 
-        document.onclick = function(event)
-        {
-            if (window.event)
-            {
+        document.onclick = function (event) {
+            if (window.event) {
                 //assign the element clicked to e (IE 6-8)
                 e = event.srcElement;
             }
-            else
-            {
+            else {
                 //assign the element clicked to e
                 e = e.target;
             }
 
-            if (e.className && e.className.indexOf('DetailsButton') != -1)
-            {
+            if (e.className && e.className.indexOf('DetailsButton') != -1) {
                 //if the element has a class name, and that is 'someclass' then...
                 let index = -1;
-                for (let i = 0; i < detailsButtons.length; i++)
-                {
+                for (let i = 0; i < detailsButtons.length; i++) {
                     if (detailsButtons[i] === e)
                         index = i;
                 }
@@ -292,105 +307,82 @@
 
         //On document load -> title of transaction and hide if nedded
         //We use tbody.title to determine transaction type
-        if (typeList.value == "Transaction")
-        {
+        if (typeList.value == "Transaction") {
             console.log("[DEBUG] On load: showing only transactions (paragony)!")
 
             //Same length for x and y
-            for (let i = 0; i < x.length; i++)
-            {
+            for (let i = 0; i < x.length; i++) {
                 //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                if (x[i].title == "Invoice")
-                {
+                if (x[i].title == "Invoice") {
                     x[i].hidden = true;
                 }
             }
         }
-        else if (typeList.value == "Invoice")
-        {
+        else if (typeList.value == "Invoice") {
             console.log("[DEBUG] On load: showing only invoices (faktury)!")
             //Same length for x and y
-            for (let i = 0; i < x.length; i++)
-            {
+            for (let i = 0; i < x.length; i++) {
                 //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                if (x[i].title == "Transaction")
-                {
+                if (x[i].title == "Transaction") {
                     x[i].hidden = true;
                 }
             }
         }
         //Do not need to hide anything -> everything visible on default
-        else
-        {
+        else {
             console.log("[DEBUG] On load: showing all transactions!")
         }
 
         //Transaction type change section -> change hidden
-        typeList.onchange = function(event)
-        {
+        typeList.onchange = function (event) {
             var value = event.target.value;
             console.log("[DEBUG] NOW SHOWING ONLY TRANSACTIONS OF TYPE " + value);
-            if (value == "Transaction")
-            {
+            if (value == "Transaction") {
                 //Show transactions
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Transaction")
-                    {
+                    if (x[i].title == "Transaction") {
                         x[i].hidden = false;
                     }
                 }
                 //Hide invoices
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Invoice")
-                    {
+                    if (x[i].title == "Invoice") {
                         x[i].hidden = true;
                         y[i].hidden = true;
                     }
                 }
             }
-            else if (value == "Transaction Invoice")
-            {
+            else if (value == "Transaction Invoice") {
                 //Hide transactions
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Transaction")
-                    {
+                    if (x[i].title == "Transaction") {
                         x[i].hidden = true;
                         y[i].hidden = true;
                     }
                 }
                 //Show invoices
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Invoice")
-                    {
+                    if (x[i].title == "Invoice") {
                         x[i].hidden = false;
                     }
                 }
             }
-            else if (value == "All")
-            {
+            else if (value == "All") {
                 //Show transactions
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Transaction")
-                    {
+                    if (x[i].title == "Transaction") {
                         x[i].hidden = false;
                     }
                 }
                 //Show invoices
-                for (let i = 0; i < x.length; i++)
-                {
+                for (let i = 0; i < x.length; i++) {
                     //console.log("[DEBUG] Typeof transaction[" + i + "]: " + x[i].title);
-                    if (x[i].title == "Invoice")
-                    {
+                    if (x[i].title == "Invoice") {
                         x[i].hidden = false;
                     }
                 }

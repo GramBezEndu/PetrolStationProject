@@ -83,6 +83,8 @@ namespace PetrolStation.Controllers
                 //Add extended transaction
                 extendedTransactions.Add(actualExtendedTransaction);
             }
+            //Sort -> newest transactions on top
+            extendedTransactions = extendedTransactions.OrderByDescending(o => o.Transaction.IdTransaction).ToList();
             return View(extendedTransactions);
         }
     }

@@ -106,7 +106,8 @@ input[type=submit] {
         }
 
         if (IdDodanegoProduktu != -1) {
-            createElement(product.IdProduct, 1, product.Name, product.QuantityInStorage, 22, 44);
+            createElement(product.IdProduct, product.Name, product.QuantityInStorage,22);
+            IdDodanegoProduktu = -1;
         }
     });
 
@@ -219,10 +220,15 @@ document.addEventListener("click", function (e) {
         let newTr = document.createElement("tr");
         for (let i = 0; i < 4; i++) {
             let newTd = document.createElement("td");
-            let tekst = document.createTextNode(arguments[i - 1] + arguments[i]);
+            let tekst = document.createTextNode(arguments[i]);
             newTd.appendChild(tekst);
             newTr.appendChild(newTd);
         }
+        let newTd = document.createElement("td");
+        let tekst = document.createTextNode(storage + supply);
+        newTd.appendChild(tekst);
+        newTr.appendChild(newTd);
+
         parent.appendChild(newTr);
     }
 </script>

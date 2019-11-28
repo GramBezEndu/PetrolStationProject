@@ -57,7 +57,6 @@ namespace PetrolStation.Controllers
             {
                 IsInvoice = false,
                 CardPayment = false,
-                TransactionValue = 0
             };
 
             //lista tankowań nierozliczonych
@@ -133,12 +132,12 @@ namespace PetrolStation.Controllers
             {
                 Date = DateTime.Now
             };
-            if (transactionModel.IdLoyalityCard == 0)
+            if (Convert.ToInt32(transactionModel.IdLoyalityCard) == 0)
                 transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
             else //do transakcji została dołączona karta
             {
-                transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
-                var pointsRequiredForPayment = transactionModel.TransactionValue * 100;
+                transaction.IdLoyalityCard = Convert.ToInt32(transactionModel.IdLoyalityCard);
+                var pointsRequiredForPayment = Convert.ToDecimal(transactionModel.TransactionValue) * 100;
                 var CardToAddPoints = await _context.LoyalityCard.FindAsync(transaction.IdLoyalityCard);
                 if (transactionModel.CardPayment) //osoba chce zapłacić kartą
                 {
@@ -218,7 +217,7 @@ namespace PetrolStation.Controllers
                 }
             }
             await _context.SaveChangesAsync();
-            return View("AddTransaction", transactionModel);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

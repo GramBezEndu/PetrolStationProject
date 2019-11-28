@@ -304,6 +304,10 @@
         var detailsButtons = document.getElementsByClassName("DetailsButton");
         var detailsInfo = document.getElementsByClassName("DetailsInfo");
 
+        var typeList = document.getElementById("TypeList");
+        var x = document.getElementsByClassName("AlwaysVisible");
+        var y = document.getElementsByClassName("DetailsInfo");
+
         console.log("[DEBUG] Details buttons count: " + detailsButtons.length);
         console.log("[DEBUG] Details tbody count: " + detailsInfo.length);
 
@@ -325,12 +329,16 @@
                         index = i;
                 }
                 detailsInfo[index].hidden = !(detailsInfo[index].hidden);
+                //change background color of always visible
+                if (detailsInfo[index].hidden == false) {
+                    x[index].style.backgroundColor = "rgba(73,80,87, 0.3)";
+                }
+                else {
+                    x[index].style.backgroundColor = "white";
+                }
             }
         }
         //Transaction Type section
-        var typeList = document.getElementById("TypeList");
-        var x = document.getElementsByClassName("AlwaysVisible");
-        var y = document.getElementsByClassName("DetailsInfo");
         console.log("[DEBUG] On load: x(rows) count " + x.length);
         console.log("[DEBUG] On load: y(rows) count " + y.length);
 

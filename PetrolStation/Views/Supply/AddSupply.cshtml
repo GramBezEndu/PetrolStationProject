@@ -1,4 +1,4 @@
-﻿
+﻿@model PetrolStation.Models.ModelePomocnicze.SupplyString
 @{
     ViewData["Title"] = "AddSupply";
 }
@@ -97,7 +97,9 @@ input[type=submit] {
         <label>Ilość</label>
         <input id="ilosc_dostawy" />
     <input type="button" id="add_product" value="Dodaj produkt" class="btn btn-primary"/>
+        <input type="button" value="Zatwierdź dostawę"  class="btn btn-success" id="zatwierdz"/>
         </div>
+    <input asp-for="@Model.supplyString" id="supplyString" hidden/>
 </form>
     </div>
 
@@ -370,5 +372,12 @@ document.addEventListener("click", function (e) {
             }
         }
     }
+
+    document.getElementById("zatwierdz").addEventListener("click", function () {
+        for (let i = 0; i < productsAddedToSupply.length; i++) {
+            document.getElementById("supplyString").value += productsAddedToSupply[i].id + " " + productsAddedToSupply[i].ilosc + " ";
+        }
+        document.getElementById("form").submit();
+    });
 
 </script>

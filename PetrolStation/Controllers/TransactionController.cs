@@ -75,35 +75,7 @@ namespace PetrolStation.Controllers
             return View(transactionModel);
         }
 
-        //[HttpPost]
-        //public IActionResult AddProduct(TransactionModel transactionModel)
-        //{
-        //    var szukanyProdukt = _context.Product.Where(p => p.Name == transactionModel.NamePurchasedProduct).ToList();
-        //    if (szukanyProdukt[0].QuantityInStorage < transactionModel.QuantityPurchasedProduct)
-        //    {
-        //        ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-        //        ViewData["Error"] = "Nie można dodać " + transactionModel.QuantityPurchasedProduct + " " + transactionModel.NamePurchasedProduct + " do koszyka, ponieważ w magazynie zostało jedynie " + szukanyProdukt[0].QuantityInStorage + " sztuk!";
-        //        return View("AddTransaction", transactionModel);
-        //    }
-        //    ProductQuantity productQuantity = new ProductQuantity();
-        //    productQuantity.product = szukanyProdukt[0];
-        //    productQuantity.Quantity = transactionModel.QuantityPurchasedProduct;
-        //    transactionModel.purchasedProducts.Add(productQuantity);
-        //    //wyzerowanie
-        //    transactionModel.TransactionValue = 0;
-        //    foreach (var item in transactionModel.purchasedProducts)
-        //        transactionModel.TransactionValue += (item.Quantity * item.product.Price);
-        //    transactionModel.QuantityPurchasedProduct = 1;
-        //    TempData.Put("key", transactionModel);
-        //    return RedirectToAction("AddProductWyswietl");
-        //}
-
-        //public IActionResult AddProductWyswietl()
-        //{
-        //    var transactionModel = TempData.Get<TransactionModel>("key");
-        //    ViewData["Produkty"] = new SelectList(_context.Product, "Name", "Name");
-        //    return View("AddTransaction", transactionModel);
-        //}
+        
 
         //POST AddTransaction
         [HttpPost]
@@ -168,10 +140,45 @@ namespace PetrolStation.Controllers
             //jeśli klient chce fakture
             if (transactionModel.IsInvoice)
             {
-                transactionInvoice.Date = transaction.Date;
-                transactionInvoice.IdLoyalityCard = transaction.IdLoyalityCard;
-                transactionInvoice.IdCar = 1;
-                transactionInvoice.IdClient = 1;
+                if (transactionModel.client.IdClient == 0) //nie ma klienta w systemie
+                {
+                    if(transactionModel.client.NIP==null && transactionModel.client.Surname == null) //kliknięto fakturę, ale nie wpisano wymaganych danych
+                    {
+                        //błąd!!!
+                        ViewData["Karty"] = _context.LoyalityCard.ToList();
+                        ViewData["Produkty"] = _context.Product.ToList();
+                        ViewData["Klienci"] = _context.Client.ToList();
+                        ViewData["Samochody"] = _context.Car.ToList();
+                        ViewBag["Error"] = "Nie podano danych do faktury!!! Transakcja została wyzerowana. Spróbuj jeszcze raz";
+                        return View("AddTransaction", transactionModel);
+                    }
+                    else //dodajemy klienta do bazy danych
+                    {
+                        Client client = new Client();
+                        client = transactionModel.client;
+                        _context.Add(client);
+                        _context.SaveChanges();
+                        var thisClient = _context.Client.Where(c=>c==client).ToList()[0];
+                        transactionInvoice.Date = transaction.Date;
+                        transactionInvoice.IdLoyalityCard = transaction.IdLoyalityCard;
+                        transactionInvoice.IdClient = thisClient.IdClient;
+                        transactionInvoice.IdCar = null;
+                    }
+                }
+                else //klient jest w systemie
+                {
+                    transactionInvoice.Date = transaction.Date;
+                    transactionInvoice.IdLoyalityCard = transaction.IdLoyalityCard;
+                    transactionInvoice.IdClient = transactionModel.client.IdClient;
+                    if (transactionModel.clientCar.IdCar == 0) //nie podano id samochodu
+                    {
+                        transactionInvoice.IdCar = null;
+                    }
+                    else //podano id samochodu
+                    {
+                        transactionInvoice.IdCar = transactionModel.clientCar.IdCar;
+                    }
+                }
                 _context.Add(transactionInvoice);
                 _context.SaveChanges();
                 thisTransaction=_context.Transaction.Where(t => t == transactionInvoice).ToList()[0];

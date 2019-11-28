@@ -153,6 +153,10 @@
         text-align: left;
     }
 
+    #pay_with_card_text {
+        margin: 40px 0 0 10px;
+    }
+
     .form-control {
         margin-top: 15px;
         margin-bottom: 15px;
@@ -251,7 +255,7 @@
                 </div>
             </div>
             <div class="width25">
-                <input type="button" class="btn btn-primary" value="dodaj" id="add_product"/>
+                <input type="button" class="btn btn-primary" value="Dodaj" id="add_product"/>
             </div>
 
             <input id="bought_input" asp-for="@Model.boughtString" hidden ="hidden" />
@@ -260,10 +264,12 @@
                 <div class="autofill">
                     <input id="card_id" class="form-control" placeholder="Numer karty stałego klienta">
                 </div>
-                <input type="checkbox" asp-for="@Model.CardPayment" disabled ="disabled"/>
-                <label>Płatność punktami</label>
+                <div>
+                    <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
+                    <label id="pay_with_card_text">Płatność punktami</label>
+                </div>
                 <div class="autofill">
-                    
+                    <input id="car_id" class="form-control" placeholder="Numery tablicy rejestracyjnej samochodu">
                 </div>
                 <div>
                     <input id="show_invoice" type="button" value="Faktura" checked="" class="btn btn-primary">
@@ -331,10 +337,10 @@
             element.classList.add("form-control");
             element.innerHTML = "";
             for (let property of this.hinted) {
-                console.log(properties);
-                console.log(property);
+                //console.log(properties);
+                //console.log(property);
                 if (properties.includes(property)) {
-                    console.log(this[property]);
+                    //console.log(this[property]);
                     element.innerHTML += "<strong>" + this[property].toString().substr(0, value.length) + "</strong>";
                     element.innerHTML += this[property].toString().substr(value.length) + "\t";
                 } else if (this[property] != null) {
@@ -472,6 +478,31 @@
                 ));
             }
         }
+
+        getList() {
+            let one = client_input.data;
+            let two = card_input.data;
+            if (one == null && two == null) { return this.list; }
+            let temp = [];
+            for (let i = 0; i < this.list.length; i++) {
+                if (one != null && two != null) {
+                    if (this.list[i].clientId == one || this.list[i].clientId == two) {
+                        temp.push(this.list[i]);
+                    }
+                } else {
+                    if (one != null) {
+                        if (this.list[i].clientId == one) {
+                            temp.push(this.list[i]);
+                        }
+                    } else {
+                        if (this.list[i].clientId == two) {
+                            temp.push(this.list[i]);
+                        }
+                    }
+                }
+            }
+            return temp;
+        }
     }
 
     class Card extends Item {
@@ -561,7 +592,7 @@
     let product_input = document.getElementById("product_id");
     let product_button = document.getElementById("add_product");
     let card_input = document.getElementById("card_id");
-    let car_input;
+    let car_input = document.getElementById("car_id");
     let client_input = document.getElementById("client_id");
     let fuellings = document.getElementsByTagName("table")[0].getElementsByTagName("input");
 
@@ -570,10 +601,13 @@
 
     let invoice_button = document.getElementById("show_invoice");
 
+    let total;
+
     product_input.focus();
 
     autofill(product_input, available);
     autofill(card_input, cards);
+    autofill(car_input, cars);
     autofill(client_input, clients);
 
     updateBought();
@@ -622,6 +656,32 @@
         //this.click();
     });
 
+    function payWithCard() {
+        let id = card_input.value;
+        let cardCheckbox = document.getElementById("pay_with_card");
+        let label = document.getElementById("pay_with_card_text");
+        let list = cards.getList();
+        let activate = false;
+        let temp = total * 100;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id == id) {
+                if (temp > 0) {
+                    if (list[i].points >= temp) {
+                        activate = true;
+                    }
+                }
+            }
+        }
+        if (activate) {
+            cardCheckbox.disabled = false;
+            label.setAttribute("style", "color: #212529");
+        } else {
+            cardCheckbox.checked = false;
+            cardCheckbox.disabled = true;
+            label.setAttribute("style", "color: #495057");
+        }
+    }
+
     function updateBought() {
         let table = document.getElementById("bought_list");
         let body = table.getElementsByTagName("tbody")[0];
@@ -664,7 +724,7 @@
                 } else {
                     cell.innerHTML = record[j];
                 }
-                console.log(record[j]);
+                //console.log(record[j]);
                 row.appendChild(cell);
             }
             cell = document.createElement("th");
@@ -685,9 +745,10 @@
         for (let i = 0; i < 4; i++) {
             row.appendChild(document.createElement("th"));
         }
-        let total = bought.getTotal();
+        total = bought.getTotal();
         total += fuelling();
         document.getElementById("sum").innerText = (total.toFixed(2));
+        payWithCard();
     }
 
     function fuelling() {
@@ -719,12 +780,15 @@
 
     function autofill(input, object) {
 
-        let object_list = object.getList();
 
         let highlighted;
 
         input.addEventListener("input", function (e) {
+            let object_list = object.getList();
             this.data = null;
+            if (this.id == "card_id") {
+                payWithCard();
+            }
             closeLists();
             let value = this.value;
             let x, y;
@@ -751,7 +815,7 @@
                     case "card_id":
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["id"];
-                            input.data = object_list[i]["id"];
+                            input.data = object_list[i]["clientId"];
                         });
                         break;
                     case "car_id":
@@ -819,7 +883,7 @@
         }
 
         function addActive(list) {
-            if (list.length < 1) return false;
+            if (list == null) return false;
             removeActive(list);
             if (highlighted >= list.length) highlighted = 0;
             if (highlighted < 0) highlighted = (list.length - 1);

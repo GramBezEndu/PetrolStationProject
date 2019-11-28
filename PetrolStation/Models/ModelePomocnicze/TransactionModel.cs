@@ -12,7 +12,7 @@ namespace PetrolStation.Models.ModelePomocnicze
         public decimal TransactionValue { get; set; }
         public bool IsInvoice { get; set; }
         public bool CardPayment { get; set; }
-        public int IdLoyalityCard { get; set; }
+        public string IdLoyalityCard { get; set; }
         public Client client { get; set; } = new Client();
         public Car clientCar { get; set; } = new Car();
     }

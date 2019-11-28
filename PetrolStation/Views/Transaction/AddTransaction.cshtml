@@ -259,10 +259,11 @@
             </div>
 
             <input id="bought_input" asp-for="@Model.boughtString" hidden ="hidden" />
+            <input id="total" asp-for="@Model.TransactionValue"/>
             <br/><br/>
             <div class="width50L">
                 <div class="autofill">
-                    <input id="card_id" class="form-control" placeholder="Numer karty stałego klienta">
+                    <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Numer karty stałego klienta">
                 </div>
                 <div>
                     <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
@@ -270,6 +271,7 @@
                 </div>
                 <div class="autofill">
                     <input id="car_id" class="form-control" placeholder="Numery tablicy rejestracyjnej samochodu">
+                    <input id="car_hidden" asp-for="@Model.clientCar.IdCar" hidden="hidden"/>
                 </div>
                 <div>
                     <input id="show_invoice" type="button" value="Faktura" checked="" class="btn btn-primary">
@@ -279,17 +281,18 @@
             <div id="invoice" class="width50R" hidden="hidden">
                 <div class="autofill">
                     <input id="client_id" class="form-control" placeholder="Wyszukiwanie klienta">
+                    <input id="client_hidden" asp-for="@Model.client.IdClient" hidden="hidden"/>
                 </div>
                 <br/><br/>
-                <input id="name" class="form-control" placeholder="Nazwa">
-                <input asp-for="@Model.client.NIP" id="nip" class="form-control" placeholder="NIP">
-                <input id="first_name" class="form-control" placeholder="Imię">
-                <input id="surname" class="form-control" placeholder="Nazwisko">
-                <input id="street" class="form-control" placeholder="Ulica">
-                <input id="house_number" class="form-control" placeholder="Numer domu">
-                <input id="apartment_number" class="form-control" placeholder="Numer mieszkania">
-                <input id="postal_code" class="form-control" placeholder="Kod poccztowy">
-                <input id="city" class="form-control" placeholder="Miasto">
+                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Nazwa">
+                <input id="nip" asp-for="@Model.client.NIP" class="form-control" placeholder="NIP">
+                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="Imię">
+                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Nazwisko">
+                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Ulica">
+                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="Numer domu">
+                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Numer mieszkania">
+                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Kod poccztowy">
+                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="Miasto">
             </div>
         </div>
 
@@ -650,10 +653,12 @@
     submit_button.addEventListener("click", function (e) {
         e.preventDefault();
         let return_bought = document.getElementById("bought_input");
+        let transaction_value = document.getElementById("total");
+        console.log(total);
+        transaction_value.value = total;
+        console.log(transaction_value.value);
         return_bought.value = bought.returnBought();
         document.getElementById("form").submit();
-        console.log("pułapka");
-        //this.click();
     });
 
     function payWithCard() {
@@ -789,6 +794,12 @@
             if (this.id == "card_id") {
                 payWithCard();
             }
+            if (this.id == "car_id") {
+                document.getElementById("car_hidden").value = "";
+            }
+            if (this.id == "client_id") {
+                document.getElementById("client_hidden").value = "";
+            }
             closeLists();
             let value = this.value;
             let x, y;
@@ -822,12 +833,14 @@
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["plate"];
                             input.data = object_list[i]["id"];
+                            document.getElementById("car_hidden").value = object_list[i]["id"];
                         });
                         break;
                     case "client_id":
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["id"];
                             input.data = object_list[i]["id"];
+                            document.getElementById("client_hidden").value = object_list[i]["id"];
                             document.getElementById("name").value = object_list[i]["name"];
                             document.getElementById("nip").value = object_list[i]["nip"];
                             document.getElementById("first_name").value = object_list[i]["firstName"];

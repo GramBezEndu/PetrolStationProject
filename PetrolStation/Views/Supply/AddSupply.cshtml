@@ -55,7 +55,7 @@ input[type=submit] {
 }
 </style>
 
-
+<div id="body">
 <h1>AddSupply</h1>
 <form asp-action="AddSupply" id="form" autocomplete="off">
     <div style='overflow:auto; width:1000px;height:300px;'>
@@ -82,7 +82,7 @@ input[type=submit] {
     <input type="button" id="add_product" value="Dodaj produkt" class="btn btn-primary"/>
         </div>
 </form>
-
+    </div>
 
 <script>
 
@@ -119,9 +119,7 @@ input[type=submit] {
                 break;
             }
         }
-        console.log(product);
-        console.log(document.getElementById("product_id").value)
-        console.log(productsAddedToSupplyContains(product));
+        
         if (IdDodanegoProduktu != -1 && document.getElementById("product_id").value == product.Name) {
             if (!productsAddedToSupplyContains(product)) {
                 createElement(product.IdProduct, product.Name, product.QuantityInStorage, parseInt(document.getElementById("ilosc_dostawy").value));
@@ -239,14 +237,25 @@ document.addEventListener("click", function (e) {
     function createElement(id, name, storage, supply) {
         let parent = document.getElementById("supply_table");
         let newTr = document.createElement("tr");
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             let newTd = document.createElement("td");
             let tekst = document.createTextNode(arguments[i]);
             newTd.appendChild(tekst);
             newTr.appendChild(newTd);
         }
+        let par = document.createElement("p");
+        let tekst = document.createTextNode(supply);
+        par.appendChild(tekst);
+        par.setAttribute('id', id);
+        par.setAttribute("class", "par");
+        par.setAttribute('onclick', 'createInput(this)');
         let newTd = document.createElement("td");
-        let tekst = document.createTextNode(storage + supply);
+        newTd.appendChild(par);
+        newTr.appendChild(newTd);
+
+        newTd = document.createElement("td");
+        newTd.setAttribute('id', "total" + id);
+        tekst = document.createTextNode(storage + supply);
         newTd.appendChild(tekst);
         newTr.appendChild(newTd);
 
@@ -286,10 +295,60 @@ document.addEventListener("click", function (e) {
         return false;
     }
 
+    function createInput(elem) {
+        console.log(elem.textContent)
+        let input = document.createElement("input");
+        input.type = "number";
+        input.setAttribute('min', '0');
+        input.value = parseInt(elem.textContent);
+        input.setAttribute('id', elem.id);
+        input.setAttribute('class', 'do_zamiany');
+        elem.parentNode.replaceChild(input, elem);
+    };
+
+    document.getElementById("body").onclick = function (ev) {
+        if (ev.target.className == "do_zamiany" || ev.target.className == "par") {
+            console.log("weszlo")
+            return;
+        }
+        let inputs = document.getElementsByClassName("do_zamiany");
+        console.log(inputs);
+        for (let i = 0; i < inputs.length; i++) {
+            document.getElementById("total" + inputs[i].id).innerHTML = parseInt(inputs[i].value) + liczbaOdId(inputs[i].id);
+            let total = parseInt(document.getElementById("total" + inputs[i].id).textContent);
+            console.log(inputs[i].id + " " + total);
+            productsAddedToSupply[indexDlaId(inputs[i].id)].ilosc = total;
+            let paragraf = document.createElement("p")
+            let text = document.createTextNode(inputs[i].value);
+            paragraf.appendChild(text);
+            paragraf.setAttribute('id', inputs[i].id);
+            paragraf.setAttribute("class","par");
+            paragraf.setAttribute('onclick', 'createInput(this)');
+            inputs[i].parentNode.replaceChild(paragraf, inputs[i]);
+            //tutaj
+        }
+    }
+
     function productNameForId(id) {
         for (let i = 0; i < productList.length; i++) {
             if (productList[i].IdProduct == id) {
                 return productList[i].Name;
+            }
+        }
+    }
+
+    function indexDlaId(idproduct) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productsAddedToSupply[i].id == idproduct) {
+                return parseInt(i);
+            }
+        }
+    }
+
+    function liczbaOdId(productid) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].IdProduct == productid) {
+                return parseInt(productList[i].QuantityInStorage);
             }
         }
     }

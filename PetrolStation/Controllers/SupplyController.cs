@@ -29,7 +29,18 @@ namespace PetrolStation.Controllers
         [HttpPost]
         public async Task<IActionResult> AddSupply(SupplyString supply)
         {
-            
+            if (supply.supplyString != null)
+            {
+                string[] IdProductsAndQuantity = supply.supplyString.Split(' ');
+                for (int i = 0; i < IdProductsAndQuantity.Length - 1; i += 2)
+                {
+                    int key = Convert.ToInt32(IdProductsAndQuantity[i]);
+                    var product = _context.Product.Find(key);
+                    product.QuantityInStorage =Convert.ToInt32(IdProductsAndQuantity[i + 1]);
+                    _context.Update(product);
+                }
+            }
+            await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
         }
     }

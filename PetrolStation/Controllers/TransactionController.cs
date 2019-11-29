@@ -124,7 +124,7 @@ namespace PetrolStation.Controllers
                         ViewData["Produkty"] = _context.Product.ToList();
                         ViewData["Klienci"] = _context.Client.ToList();
                         ViewData["Samochody"] = _context.Car.ToList();
-                        ViewData["Error"] = "This card doesn't have enough points to pay for this transaction";
+                        ViewBag.Error = "This card doesn't have enough points to pay for this transaction";
                         return View("AddTransaction", transactionModel);
                     }
                 }
@@ -149,8 +149,9 @@ namespace PetrolStation.Controllers
                         ViewData["Produkty"] = _context.Product.ToList();
                         ViewData["Klienci"] = _context.Client.ToList();
                         ViewData["Samochody"] = _context.Car.ToList();
-                        ViewBag["Error"] = "Nie podano danych do faktury!!! Transakcja została wyzerowana. Spróbuj jeszcze raz";
-                        return View("AddTransaction", transactionModel);
+                        ViewBag.Error = "Nie podano danych do faktury!!! Transakcja została wyzerowana. Spróbuj jeszcze raz";
+                        transactionModel.IsInvoice = false;
+                        return View("AddTransaction", transactionModel);//??
                     }
                     else //dodajemy klienta do bazy danych
                     {

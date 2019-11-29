@@ -1,0 +1,40 @@
+﻿@model PetrolStation.Models.ModelePomocnicze.SaleOverPeriodOfTimeReport.SaleOverPeriodOfTimeModel
+@{
+    ViewData["Title"] = "SaleOverPeriodOfTime";
+}
+
+<h1>Sprzedaż w wybranym okresie</h1>
+<form>
+    <label>Sortuj według:</label>
+    <select asp-for="@Model.Order" class="form-control" style="width:210px">
+        <option value="1">Id</option>
+        <option value="2">Nazwy</option>
+        <option value="3">Ilości sprzedanych</option>
+    </select>
+    <label asp-for="@Model.PoczatekPrzedzialu">Data początkowa</label>
+    <input asp-for="@Model.PoczatekPrzedzialu" class="form-control" style="width:210px" />
+    <br />
+    <label asp-for="@Model.KoniecPrzedzialu">Data końcowa</label>
+    <input asp-for="@Model.KoniecPrzedzialu" class="form-control" style="width:210px" />
+    <br />
+    <input type="submit" value="Generuj" formaction="GenerujSaleOverPeriodOfTime" class="btn btn-primary" />
+</form>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Nazwa produktu</th>
+            <th scope="col">Ilość sprzedanych</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.soldProducts.Count; i++)
+        {
+        <tr>
+            <th scope="row">@Model.soldProducts[i].Id</th>
+            <td>@Model.soldProducts[i].Name</td>
+            <td>@Model.soldProducts[i].SoldQuantity</td>
+        </tr>
+        }
+    </tbody>
+</table>

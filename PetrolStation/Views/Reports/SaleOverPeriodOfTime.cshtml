@@ -4,7 +4,7 @@
 }
 
 <h1>Sprzedaż w wybranym okresie</h1>
-<form>
+<form asp-action="SaleOverPeriodOfTime">
     <label>Sortuj według:</label>
     <select asp-for="@Model.Order" class="form-control" style="width:210px">
         <option value="1">Id</option>
@@ -17,7 +17,7 @@
     <label asp-for="@Model.KoniecPrzedzialu">Data końcowa</label>
     <input asp-for="@Model.KoniecPrzedzialu" class="form-control" style="width:210px" />
     <br />
-    <input type="submit" value="Generuj" formaction="GenerujSaleOverPeriodOfTime" class="btn btn-primary" />
+    <input type="submit" value="Generuj" class="btn btn-primary" />
 </form>
 <table class="table table-hover">
     <thead>

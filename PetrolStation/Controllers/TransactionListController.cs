@@ -61,7 +61,7 @@ namespace PetrolStation.Controllers
                 //assign used car in transaction (Invoice only)
                 if(actualExtendedTransaction.Transaction is TransactionInvoice transactionInvoice1)
                 {
-                    actualExtendedTransaction.Car = _context.Car.Where(x => x.Client == transactionInvoice1.Client).FirstOrDefault();
+                    actualExtendedTransaction.Car = _context.Car.Where(x => x.IdCar == transactionInvoice1.IdCar).FirstOrDefault();
                 }
                 //assign fueling list
                 actualExtendedTransaction.FuelingList = _context.FuelingList.Where(x => x.Transaction == actualExtendedTransaction.Transaction).ToList();

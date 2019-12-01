@@ -3,8 +3,15 @@
     .HeaderSite {
         display: inline-block;
         position: relative;
+        height: 80px;
+    }
+
+    .AddCarHeader {
+        display: inline-block;
+        position: relative;
         height: 90px;
     }
+
     .Button {
         color: #fff;
         background-color: #007bff;
@@ -37,6 +44,11 @@
         <option>Company</option>
     </select>
 </div>
+@*car button*@
+<div class="AddCarHeader">
+    <h4 style="position: absolute; margin-top:150px; margin-left:370px; width:200px">Add assigned car</h4>
+    <input style="width:40px; height:40px; margin-top:145px; margin-left:560px" type="button" class="Button" value="+" id="AddCar" />
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -44,22 +56,22 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label" hidden title="Company"></label>
-                <input asp-for="Name" class="form-control" hidden title="Company"/>
+                <input asp-for="Name" class="form-control" hidden title="Company" />
                 <span asp-validation-for="Name" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label" title="Person"></label>
-                <input asp-for="FirstName" class="form-control" title="Person"/>
+                <input asp-for="FirstName" class="form-control" title="Person" />
                 <span asp-validation-for="FirstName" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Surname" class="control-label" title="Person"></label>
-                <input asp-for="Surname" class="form-control" title="Person"/>
+                <input asp-for="Surname" class="form-control" title="Person" />
                 <span asp-validation-for="Surname" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
                 <label asp-for="NIP" class="control-label" hidden title="Company"></label>
-                <input asp-for="NIP" class="form-control" hidden title="Company"/>
+                <input asp-for="NIP" class="form-control" hidden title="Company" />
                 <span asp-validation-for="NIP" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
@@ -88,22 +100,21 @@
                 <span asp-validation-for="Locality" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Add" class="Button" />
+                <input type="submit" value="Add client" class="Button" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <input class="Button" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Storage")'" />
+    <input class="Button" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Clients")'" />
 </div>
 
 <script>
     var typeList = document.getElementById("TypeList");
     var companyElements = document.querySelectorAll('[title="Company"]');
     var personElements = document.querySelectorAll('[title="Person"]');
-    typeList.onchange = function (event)
-    {
+    typeList.onchange = function (event) {
         var value = event.target.value;
         if (value == "Company") {
             //hide person elements
@@ -117,13 +128,24 @@
         }
         else {
             //hide company elements
-                for (let i = 0; i < companyElements.length; i++) {
-                    companyElements[i].hidden = true;
+            for (let i = 0; i < companyElements.length; i++) {
+                companyElements[i].hidden = true;
             }
             //show person elements
-                for (let i = 0; i < personElements.length; i++) {
-                    personElements[i].hidden = false;
+            for (let i = 0; i < personElements.length; i++) {
+                personElements[i].hidden = false;
             }
+        }
+    }
+    //Add car section
+    var button = document.getElementById("AddCar");
+    button.onclick = function (event) {
+        var value = event.target.value;
+        if (value == "+") {
+            event.target.value = '+';
+        }
+        else {
+            event.target.value = '+';
         }
     }
 </script>

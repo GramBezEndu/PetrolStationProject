@@ -1,0 +1,985 @@
+﻿@model PetrolStation.Models.ModelePomocnicze.TransactionModel
+
+@{
+    ViewData["Title"] = "AddTransaction";
+}
+
+<style>
+    form {
+        width: 100%;
+    }
+
+    table.scroll {
+        width: 100%;
+    }
+
+    table.scroll tbody,
+    table.scroll thead {
+        display: block;
+    }
+
+    .btn-default {
+        border: 1px solid #ced4da;
+    }
+
+    table.scroll tbody {
+        height: 200px;
+        overflow-y: auto;
+    }
+
+    table.scroll tr {
+        display: block;
+        font-size: 0;
+    }
+
+    table.scroll th:last-child {
+        text-align: center;
+    }
+
+    table.scroll th:nth-child(1) {
+        width: 20%;
+    }
+
+    table.scroll th:nth-child(2) {
+        width: 40%;
+    }
+
+    table.scroll th:nth-child(3) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(4) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(5) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(6) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll tbody th:nth-child(4) {
+        padding-bottom: 0;
+    }
+
+    table.scroll tbody th:nth-child(4) input {
+        display: inline-block;
+        width: 100%;
+    }
+
+    table.scroll tbody th:last-child {
+        padding-top: calc(.75rem - 7px);
+        padding-bottom: calc(.75rem - 7px);
+    }
+
+    table.scroll p {
+        margin: 0;
+    }
+
+
+    table.scroll th {
+        font-size: 16px;
+        display: inline-block;
+        box-sizing: border-box;
+        width: calc(100% / 6);
+    }
+
+    .width100 {
+        width: 100%;
+        font-size: 0;
+        padding: 0 20px 0 20px;
+    }
+
+    .width50R {
+        vertical-align: top;
+        font-size: 16px;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 0 0 0 10px;
+        margin: 20px 0 20px 0;
+        width: 50%;
+    }
+
+    .width50L {
+        vertical-align: top;
+        font-size: 16px;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 0 10px 0 0;
+        margin: 20px 0 20px 0;
+        width: 50%;
+    }
+
+    .width75 {
+        vertical-align: top;
+        font-size: 16px;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 15px 10px 15px 0;
+        width: 75%;
+    }
+
+    .width25 {
+        vertical-align: top;
+        font-size: 16px;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 0 0 0 10px;
+        width: 25%;
+    }
+
+    .autofill {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .autofill .form-control {
+        margin: unset;
+    }
+
+    .autofill input {
+        border-color: #1861ac;
+    }
+
+    .autofill_list {
+        position: absolute;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
+
+
+    .width50R .btn,
+    .width50L .btn {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        width: 100%;
+        display: inline-block;
+    }
+
+    .width25 .btn {
+        margin-bottom: 15px;
+        width: 100%;
+        display: inline-block;
+    }
+
+    .width100 .btn {
+        margin-top: 15px;
+        margin-bottom: 15px;
+        width: 100%;
+        display: inline-block;
+    }
+
+    #sum {
+        display:inline-block;
+        width: 25%;
+        margin-left: 20px;
+        text-align: left;
+    }
+
+    #pay_with_card_text {
+        margin: 40px 0 0 10px;
+    }
+
+    .form-control {
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .autofill_list div {
+        box-sizing: border-box;
+        padding: 5px 10px 10px 10px;
+        margin: 0;
+        cursor: pointer;
+        background-color: #fff;
+        width: auto;
+        height:auto;
+    }
+
+    .autofill div p {
+        margin: 0;
+    }
+
+    .autofill_list div:hover {
+        background-color: #e9e9e9;
+    }
+
+    .autofill_active {
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+</style>
+
+<h1>AddTransaction</h1>
+
+<h4>Transaction</h4>
+<hr />
+<div class="row">
+    <form asp-action="AddTransactionPOST" id="form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @if (Model.purchasedFueling.Count != 0)
+        {
+            for (var i = 0; i < Model.purchasedFueling.Count; i++)
+            {
+                <input asp-for="@Model.purchasedFueling[i].VelueOfFueling" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.Date" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.IdGasPump" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.Quantity" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.IdFuel" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.IdFueling" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.IdFuel" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.Name" hidden />
+                <input asp-for="@Model.purchasedFueling[i].fueling.Fuel.PriceForLiter" hidden />
+            }
+        }
+        <table class="table table-striped">
+            <tr>
+                <th scope="col">Numer dystrybutora</th>
+                <th scope="col">Nazwa paliwa</th>
+                <th scope="col">Ilość</th>
+                <th scope="col">Cena za litr</th>
+                <th scope="col">Wartość brutto</th>
+                <th scope="col">Rozliczyć?</th>
+            </tr>
+            @if (Model.purchasedFueling.Count != 0)
+            {
+                for (var i = 0; i < Model.purchasedFueling.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.purchasedFueling[i].fueling.IdGasPump</td>
+                        <td>@Model.purchasedFueling[i].fueling.Fuel.Name</td>
+                        <td>@Model.purchasedFueling[i].fueling.Quantity</td>
+                        <td>@Model.purchasedFueling[i].fueling.Fuel.PriceForLiter</td>
+                        <td>@Model.purchasedFueling[i].VelueOfFueling</td>
+                        <td><input type="checkbox" asp-for="@Model.purchasedFueling[i].IsChecked" onclick="updateBought()" /></td>
+                    </tr>
+                }
+            }
+        </table>
+        <input asp-for="@Model.IsInvoice" hidden/>
+        <hr/>
+
+        <table class="scroll table table-striped" id="bought_list">
+            <thead>
+                <tr>
+                    <th>Kod</th>
+                    <th>Nazwa</th>
+                    <th>Cena</th>
+                    <th>Ilość</th>
+                    <th>Suma</th>
+                    <th>Usuń</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div style="text-align: right;">
+            <h5 style="display: inline;">razem:</h5><h2 id="sum"></h2>
+        </div>
+        <div class="width100">
+            <div class="width75">
+                <div class="autofill">
+                    <input id="product_id" class="form-control" placeholder="Wyszukiwanie produktu">
+                </div>
+            </div>
+            <div class="width25">
+                <input type="button" class="btn btn-primary" value="Dodaj" id="add_product"/>
+            </div>
+
+            <input id="bought_input" asp-for="@Model.boughtString" hidden ="hidden" />
+            <input id="total" asp-for="@Model.TransactionValue" hidden="hidden"/>
+            <br/><br/>
+            <div class="width50L">
+                <div class="autofill">
+                    <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Numer karty stałego klienta">
+                </div>
+                <div>
+                    <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
+                    <label id="pay_with_card_text">Płatność punktami</label>
+                </div>
+                <div class="autofill">
+                    <input id="car_id" class="form-control" placeholder="Numery tablicy rejestracyjnej samochodu">
+                    <input id="car_hidden" asp-for="@Model.clientCar.IdCar" hidden="hidden"/>
+                </div>
+                <div>
+                    <input id="show_invoice" type="button" value="Faktura" checked="" class="btn btn-primary">
+                </div>
+            </div>
+
+            <div id="invoice" class="width50R" hidden="hidden">
+                <div class="autofill">
+                    <input id="client_id" class="form-control" placeholder="Wyszukiwanie klienta">
+                    <input id="client_hidden" asp-for="@Model.client.IdClient" hidden="hidden"/>
+                </div>
+                <br/><br/>
+                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Nazwa" oninput="removeSelected()">
+                <input id="nip" asp-for="@Model.client.NIP" class="form-control" placeholder="NIP" oninput="removeSelected()">
+                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="Imię" oninput="removeSelected()">
+                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Nazwisko" oninput="removeSelected()">
+                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Ulica" oninput="removeSelected()">
+                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="Numer domu" oninput="removeSelected()">
+                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Numer mieszkania" oninput="removeSelected()">
+                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Kod poccztowy" oninput="removeSelected()">
+                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="Miasto" oninput="removeSelected()">
+            </div>
+        </div>
+
+        <input asp-for="@Model.TransactionValue" hidden class="wartoscTransakcji"/>
+        @if (ViewBag.Error != null)
+        {
+            <p style="color:red">@ViewBag.Error</p>
+        }
+        <br/>
+        <input asp-for="@Model.IsInvoice" id="IsInvoice" hidden/>
+        <div class="width100">
+            <input type="button" id="send" value="Zatwierdź transakcję" class="btn btn-primary"/>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+
+</div>
+
+<script>
+    class Item {
+        constructor(searchable, hinted) {
+            this.searchable = searchable;
+            this.hinted = hinted;
+        }
+
+        getMaching(value) {
+            let properties = [];
+            for (let property of this.searchable) {
+                if (this[property] != null) {
+                    if (this[property].toString().substr(0, value.length).toUpperCase() == value.toUpperCase()) {
+                        properties.push(property);
+                    }
+                }
+            }
+            return properties;
+        }
+
+        toHtml(value) {
+            let properties = this.getMaching(value);
+            if (properties.length < 1) { return null; }
+            let element = document.createElement("div");
+            element.classList.add("form-control");
+            let column;
+            for (let property of this.hinted) {
+                column = document.createElement("p");
+                let temp = this.hinted.length;
+                if (this.hinted.length === 9) {
+                    temp = 3;
+                }
+                temp = temp.toString();
+                column.setAttribute("style", "display: inline-block; width: calc(100% / " + temp + ");")
+                column.innerHTML = "";
+                //console.log(properties);
+                //console.log(property);
+                if (properties.includes(property)) {
+                    //console.log(this[property]);
+                    column.innerHTML += "<strong>" + this[property].toString().substr(0, value.length) + "</strong>";
+                    column.innerHTML += this[property].toString().substr(value.length) + "\t";
+                } else if (this[property] != null) {
+                    column.innerHTML += this[property].toString() + "\t";
+                } else {
+                    column.innerHTML += "\t";
+                }
+                element.appendChild(column);
+            }
+            return element;
+        }
+    }
+
+    class Product extends Item {
+        constructor(id, name, storage, price, points) {
+            super(["id", "name"], ["id", "name", "storage", "price"]);
+            this.id = parseInt(id);
+            this.name = name;
+            this.storage = parseInt(storage);
+            this.price = parseFloat(price);
+            this.points = parseInt(points);
+        }
+    }
+
+    class ProductList {
+        constructor(products) {
+            this.list = [];
+            this.numbers = [];
+            this.total = 0;
+            let temp;
+            if (products == undefined)
+                return;
+            while (products.length > 0) {
+                temp = products.pop();
+                this.list.push(new Product(
+                    temp.IdProduct,
+                    temp.Name,
+                    temp.QuantityInStorage,
+                    temp.Price,
+                    temp.PriceInPoints
+                ));
+            }
+        }
+
+        addProduct(product) {
+            if (this.list.includes(product)) {
+                this.numbers[this.list.indexOf(product)]++
+            } else {
+                this.list.push(product);
+                this.numbers.push(1);
+            }
+        }
+
+        printList() {
+            for (let product of this.list) {
+                console.log(product);
+            }
+        }
+
+        calculateTotal() {
+            this.total = 0;
+            for (let i in this.list) {
+                this.total += this.list[i].price * this.numbers[i];
+            }
+        }
+
+        getTotal() {
+            this.calculateTotal();
+            return this.total;
+        }
+
+        getList() {
+            return this.list;
+        }
+
+        getNumbers() {
+            return this.numbers;
+        }
+
+        setNumber(index, value) {
+            this.numbers[index] = value;
+        }
+
+        getProduct(x) {
+            return this.list[x];
+        }
+
+        removeProduct(x) {
+            if (this.list.includes(x)) {
+                let index = this.list.indexOf(x);
+                this.list.splice(index, 1);
+                this.numbers.splice(index, 1);
+            }
+        }
+        searchById(x) {
+            for (let product of this.list) {
+                if (product.id === x) {
+                    return product;
+                }
+            }
+        }
+
+        returnBought() {
+            let string = "";
+            for (let i = 0; i < this.list.length; i++) {
+                string += this.list[i].id.toString() + "," + this.numbers[i].toString() + ";";
+            }
+            return string;
+        }
+    }
+
+    class Car extends Item {
+        constructor(id, clientId, plate, brand, model) {
+            super(["clientId", "plate"], ["clientId", "plate", "brand", "model"]);
+            this.id = parseInt(id);
+            this.clientId = parseInt(clientId);
+            this.plate = plate;
+            this.brand = brand;
+            this.model = model;
+        }
+    }
+
+    class CarList {
+        constructor(cars) {
+            this.list = [];
+            let temp;
+            while (cars.length > 0) {
+                temp = cars.pop();
+                this.list.push(new Car(
+                    temp.IdCar,
+                    temp.IdClient,
+                    temp.NumberPlate,
+                    temp.CarBrand,
+                    temp.CarModel
+                ));
+            }
+        }
+
+        getList() {
+            let one = client_input.data;
+            let two = card_input.data;
+            if (one == null && two == null) { return this.list; }
+            let temp = [];
+            for (let i = 0; i < this.list.length; i++) {
+                if (one != null && two != null) {
+                    if (this.list[i].clientId == one || this.list[i].clientId == two) {
+                        temp.push(this.list[i]);
+                    }
+                } else {
+                    if (one != null) {
+                        if (this.list[i].clientId == one) {
+                            temp.push(this.list[i]);
+                        }
+                    } else {
+                        if (this.list[i].clientId == two) {
+                            temp.push(this.list[i]);
+                        }
+                    }
+                }
+            }
+            return temp;
+        }
+    }
+
+    class Card extends Item {
+        constructor(id, clientId, points) {
+            super(["id", "clientId"], ["id", "clientId", "points"]);
+            this.id = parseInt(id);
+            this.clientId = parseInt(clientId);
+            this.points = parseInt(points);
+        }
+
+    }
+
+    class CardList {
+        constructor(cards) {
+            this.list = [];
+            let temp;
+            while (cards.length > 0) {
+                temp = cards.pop();
+                this.list.push(new Card(
+                    temp.IdLoyalityCard,
+                    temp.IdClient,
+                    temp.ActualPoints
+                ));
+            }
+        }
+
+        getList() {
+            return this.list;
+        }
+    }
+
+    class Client extends Item {
+        constructor(id, name, firstName, surname, nip, street, houseNumber, apartmentNumber, postalCode, city) {
+            super(["name", "surname", "nip"],
+                ["name", "surname", "nip", "firstName", "street", "houseNumber", "apartmentNumber", "postalCode", "city"]
+            );
+            this.id = parseInt(id);
+            this.name = name;
+            this.firstName = firstName;
+            this.surname = surname;
+            this.nip = nip;
+            this.street = street;
+            this.houseNumber = houseNumber;
+            this.apartmentNumber = apartmentNumber;
+            this.postalCode = postalCode;
+            this.city = city;
+        }
+    }
+
+    class ClientList {
+        constructor(clients) {
+            this.list = [];
+            let temp;
+            while (clients.length > 0) {
+                temp = clients.pop();
+                this.list.push(new Client(
+                    temp.IdClient,
+                    temp.Name,
+                    temp.FirstName,
+                    temp.Surname,
+                    temp.NIP,
+                    temp.Street,
+                    temp.HouseNumber,
+                    temp.ApartmentNumber,
+                    temp.Postcode,
+                    temp.Locality
+                ));
+            }
+        }
+
+        getList() {
+            return this.list;
+        }
+    }
+
+    let produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
+    let karty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Karty));
+    let klienci = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Klienci));
+    let samochody = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Samochody));
+
+    let available = new ProductList(produkty);
+    let bought = new ProductList();
+    let cards = new CardList(karty);
+    let cars = new CarList(samochody);
+    let clients = new ClientList(klienci);
+
+
+    let product_input = document.getElementById("product_id");
+    let product_button = document.getElementById("add_product");
+    let card_input = document.getElementById("card_id");
+    let car_input = document.getElementById("car_id");
+    let client_input = document.getElementById("client_id");
+    let fuellings = document.getElementsByTagName("table")[0].getElementsByTagName("input");
+
+
+    let submit_button = document.getElementById("send");
+
+    let invoice_button = document.getElementById("show_invoice");
+
+    let total;
+
+    product_input.focus();
+
+    autofill(product_input, available);
+    autofill(card_input, cards);
+    autofill(car_input, cars);
+    autofill(client_input, clients);
+
+    updateBought();
+
+    product_button.addEventListener("click", function (e) {
+        if (!product_input.value) return;
+        if (product_input.data != null) {
+            bought.addProduct(available.getProduct(product_input.data));
+            product_input.data = null;
+        } else {
+            let temp = available.searchById(product_input.data);
+            if (temp) {
+                bought.addProduct(temp);
+            }
+            else {
+                //jakiś alert tutaj
+            }
+        }
+        product_input.value = null;
+        updateBought();
+        product_input.focus();
+    });
+
+    invoice_button.addEventListener("click", function (e) {
+        if (this.getAttribute("checked") === "checked") {
+            document.getElementById("invoice").hidden = true;
+            document.getElementById("IsInvoice").checked = false;
+            this.setAttribute("checked", "");
+            this.classList.remove("btn-default");
+            this.classList.add("btn-primary");
+        } else {
+            document.getElementById("invoice").hidden = false;
+            document.getElementById("IsInvoice").checked = true;
+            this.setAttribute("checked", "checked");
+            this.classList.add("btn-default");
+            this.classList.remove("btn-primary");
+        }
+    });
+
+    submit_button.addEventListener("click", function (e) {
+        e.preventDefault();
+        let return_bought = document.getElementById("bought_input");
+        let transaction_value = document.getElementById("total");
+        console.log(total);
+        transaction_value.value = total;
+        console.log(transaction_value.value);
+        return_bought.value = bought.returnBought();
+        document.getElementById("form").submit();
+    });
+
+    function removeSelected() {
+        client_input.value = "Nowy klient";
+        client_input.data = null;
+        document.getElementById("client_hidden").value = "";
+    }
+
+    function payWithCard() {
+        let id = card_input.value;
+        let cardCheckbox = document.getElementById("pay_with_card");
+        let label = document.getElementById("pay_with_card_text");
+        let list = cards.getList();
+        let activate = false;
+        let temp = total * 100;
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id == id) {
+                if (temp > 0) {
+                    if (list[i].points >= temp) {
+                        activate = true;
+                    }
+                }
+            }
+        }
+        if (activate) {
+            cardCheckbox.disabled = false;
+            label.setAttribute("style", "color: #212529");
+        } else {
+            cardCheckbox.checked = false;
+            cardCheckbox.disabled = true;
+            label.setAttribute("style", "color: #495057");
+        }
+    }
+
+    function updateBought() {
+        let table = document.getElementById("bought_list");
+        let body = table.getElementsByTagName("tbody")[0];
+        body.innerHTML = "";
+        let row, cell;
+        let products = bought.getList()
+        let numbers = bought.getNumbers();
+        let record;
+        for (let i = 0; i < products.length; i++) {
+            row = document.createElement("tr");
+            record = []
+            record.push(products[products.length - 1 - i].id.toString());
+            record.push(products[products.length - 1 - i].name.toString());
+            record.push(products[products.length - 1 - i].price.toFixed(2));
+            record.push(numbers[products.length - 1 - i].toFixed(2));
+            record.push((Math.round(record[2] * record[3] * 100) / 100).toFixed(2));
+            for (let j = 0; j < record.length; j++) {
+                cell = document.createElement("th");
+                if (j == 3) {
+                    let p = document.createElement("p");
+                    p.innerHTML = record[j];
+                    p.addEventListener("click", function (e) {
+                        let saved = body.getElementsByTagName("tr")[i].getElementsByTagName("th")[3];
+                        saved.innerHTML = "";
+                        let input = document.createElement("input");
+                        input.value = p.innerHTML;
+                        input.addEventListener("focusout", function (e) {
+                            if (validate(input.value)) {
+                                bought.setNumber(products.length - 1 - i, parseFloat(input.value))
+                                updateBought();
+                            } else {
+                                this.focus();
+                                // jakiś alert
+                            }
+                        });
+                        saved.appendChild(input);
+                        input.focus();
+                    });
+                    cell.appendChild(p);
+                } else {
+                    cell.innerHTML = record[j];
+                }
+                //console.log(record[j]);
+                row.appendChild(cell);
+            }
+            cell = document.createElement("th");
+            let button = document.createElement("input");
+            button.setAttribute("value", "Usuń");
+            button.setAttribute("type", "button");
+            button.classList.add("btn");
+            button.classList.add("btn-danger");
+            button.addEventListener("click", function (e) {
+                bought.removeProduct(products[products.length - 1 - i]);
+                updateBought();
+            });
+            cell.appendChild(button);
+            row.appendChild(cell);
+            body.appendChild(row);
+        }
+        row = document.createElement("tr");
+        for (let i = 0; i < 4; i++) {
+            row.appendChild(document.createElement("th"));
+        }
+        total = bought.getTotal();
+        total += fuelling();
+        document.getElementById("sum").innerText = (total.toFixed(2));
+        payWithCard();
+    }
+
+    function fuelling() {
+        let price = 0;
+        let checkboxes = document.getElementsByTagName("table")[0].getElementsByTagName("input");
+        for (let checkbox of checkboxes) {
+            if (checkbox.checked) {
+                let parent = checkbox.parentNode.parentNode;
+                price += parseFloat(parent.getElementsByTagName("td")[4].innerHTML);
+            }
+        }
+        return price;
+    }
+
+    function validate(value) {
+        if (isNaN(value))
+        {
+            return false;
+        }
+        if (value.length == 0) {          
+            return false;
+        }
+        if (value < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    function autofill(input, object) {
+
+
+        let highlighted;
+
+        input.addEventListener("focus", function (e) {
+            if (this.id == "client_id") {
+                client_input.data = null;
+                document.getElementById("client_hidden").value = "";
+                document.getElementById("name").value = "";
+                document.getElementById("nip").value = "";
+                document.getElementById("first_name").value = "";
+                document.getElementById("surname").value = "";
+                document.getElementById("street").value = "";
+                document.getElementById("house_number").value = "";
+                document.getElementById("apartment_number").value = "";
+                document.getElementById("postal_code").value = "";
+                document.getElementById("city").value = "";
+            }
+            input.value = "";
+        });
+
+        input.addEventListener("input", function (e) {
+            let object_list = object.getList();
+            this.data = null;
+            if (this.id == "card_id") {
+                payWithCard();
+            }
+            if (this.id == "car_id") {
+                document.getElementById("car_hidden").value = "";
+            }
+            if (this.id == "client_id") {
+                document.getElementById("client_hidden").value = "";
+            }
+            closeLists();
+            let value = this.value;
+            let x, y;
+            if (!value) {
+                return false;
+            }
+            highlighted = -1;
+            x = document.createElement("div");
+            x.setAttribute("id", this.id + "autofill_list");
+            x.setAttribute("class", "autofill_list");
+            this.parentNode.appendChild(x);
+            for (let i = 0; i < object_list.length; i++) {
+                let y = object_list[i].toHtml(value);
+                if (y == null) {
+                    continue;
+                }
+                switch (this.id) {
+                    case "product_id":
+                        y.addEventListener("click", function (e) {
+                            input.value = object_list[i]["name"];
+                            input.data = i;
+                        });
+                        break;
+                    case "card_id":
+                        y.addEventListener("click", function (e) {
+                            input.value = object_list[i]["id"];
+                            input.data = object_list[i]["clientId"];
+                        });
+                        break;
+                    case "car_id":
+                        y.addEventListener("click", function (e) {
+                            input.value = object_list[i]["plate"];
+                            input.data = object_list[i]["id"];
+                            document.getElementById("car_hidden").value = object_list[i]["id"];
+                        });
+                        break;
+                    case "client_id":
+                        y.addEventListener("click", function (e) {
+                            input.value = "Klient z listy (id = " + object_list[i]["id"] + ")";
+                            input.data = object_list[i]["id"];
+                            document.getElementById("client_hidden").value = object_list[i]["id"];
+                            document.getElementById("name").value = object_list[i]["name"];
+                            document.getElementById("nip").value = object_list[i]["nip"];
+                            document.getElementById("first_name").value = object_list[i]["firstName"];
+                            document.getElementById("surname").value = object_list[i]["surname"];
+                            document.getElementById("street").value = object_list[i]["street"];
+                            document.getElementById("house_number").value = object_list[i]["houseNumber"];
+                            document.getElementById("apartment_number").value = object_list[i]["apartmentNumber"];
+                            document.getElementById("postal_code").value = object_list[i]["postalCode"];
+                            document.getElementById("city").value = object_list[i]["city"];
+
+                        });
+                    default:
+                        break;
+                }
+                x.appendChild(y);
+            }
+        });
+
+        input.addEventListener("keydown", function (e) {
+            let list = document.getElementById(this.id + "autofill_list");
+            if (list) {
+                list = list.getElementsByTagName("div");
+            }
+            if (e.keyCode == 40) { //down
+                highlighted++;
+                addActive(list);
+            } else if (e.keyCode == 38) { //up
+                highlighted--;
+                addActive(list);
+            } else if (e.keyCode == 13) { //enter
+                e.preventDefault();
+                if (highlighted > -1) {
+                    if (list) {
+                        list[highlighted].click();
+                    } else if (this.id == "product_id") {
+                        product_button.click();
+                    }
+                }
+            }
+        });
+
+        document.addEventListener("click", function (e) {
+            closeLists(e.target);
+        });
+
+        function closeLists(element) {
+            let lists = document.getElementsByClassName("autofill_list");
+            for (let i = 0; i < lists.length; i++) {
+                if (element != input) {
+                    lists[i].parentNode.removeChild(lists[i]);
+                }
+            }
+        }
+
+        function addActive(list) {
+            if (list == null) return false;
+            removeActive(list);
+            if (highlighted >= list.length) highlighted = 0;
+            if (highlighted < 0) highlighted = (list.length - 1);
+            list[highlighted].classList.add("autofill_active");
+        }
+
+        function removeActive(list) {
+            for (var i = 0; i < list.length; i++) {
+                list[i].classList.remove("autofill_active");
+            }
+        }
+    }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

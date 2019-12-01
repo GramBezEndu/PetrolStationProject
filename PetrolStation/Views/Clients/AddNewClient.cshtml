@@ -1,36 +1,66 @@
 ﻿@model PetrolStation.Models.Client
-
+<style>
+    .HeaderSite {
+        display: inline-block;
+        position: relative;
+        height: 90px;
+    }
+    .Button {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+</style>
 @{
     ViewData["Title"] = "AddNewClient";
 }
 
-<h1>AddNewClient</h1>
-
-<h4>Client</h4>
+<div class="HeaderSite">
+    <h1 style="position:absolute; margin-top:30px; width:300px">Add new client</h1>
+    <h4 style="position: absolute; margin-top:15px; margin-left:300px; width:300px">Select client type</h4>
+    <select class="browser-default custom-select custom-select-lg mb-3" id="TypeList" style="position: absolute; margin-top:45px; margin-left:300px; width:250px">
+        <option>Person</option>
+        <option>Company</option>
+    </select>
+</div>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="AddNewClient">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="Name" class="control-label" hidden title="Company"></label>
+                <input asp-for="Name" class="form-control" hidden title="Company"/>
+                <span asp-validation-for="Name" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <label asp-for="FirstName" class="control-label" title="Person"></label>
+                <input asp-for="FirstName" class="form-control" title="Person"/>
+                <span asp-validation-for="FirstName" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Surname" class="control-label"></label>
-                <input asp-for="Surname" class="form-control" />
-                <span asp-validation-for="Surname" class="text-danger"></span>
+                <label asp-for="Surname" class="control-label" title="Person"></label>
+                <input asp-for="Surname" class="form-control" title="Person"/>
+                <span asp-validation-for="Surname" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
-                <label asp-for="NIP" class="control-label"></label>
-                <input asp-for="NIP" class="form-control" />
-                <span asp-validation-for="NIP" class="text-danger"></span>
+                <label asp-for="NIP" class="control-label" hidden title="Company"></label>
+                <input asp-for="NIP" class="form-control" hidden title="Company"/>
+                <span asp-validation-for="NIP" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Street" class="control-label"></label>
@@ -58,13 +88,42 @@
                 <span asp-validation-for="Locality" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add" class="Button" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="ClientList">View client list</a>
+    <input class="Button" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Storage")'" />
 </div>
 
+<script>
+    var typeList = document.getElementById("TypeList");
+    var companyElements = document.querySelectorAll('[title="Company"]');
+    var personElements = document.querySelectorAll('[title="Person"]');
+    typeList.onchange = function (event)
+    {
+        var value = event.target.value;
+        if (value == "Company") {
+            //hide person elements
+            for (let i = 0; i < personElements.length; i++) {
+                personElements[i].hidden = true;
+            }
+            //show company elements
+            for (let i = 0; i < companyElements.length; i++) {
+                companyElements[i].hidden = false;
+            }
+        }
+        else {
+            //hide company elements
+                for (let i = 0; i < companyElements.length; i++) {
+                    companyElements[i].hidden = true;
+            }
+            //show person elements
+                for (let i = 0; i < personElements.length; i++) {
+                    personElements[i].hidden = false;
+            }
+        }
+    }
+</script>

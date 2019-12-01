@@ -43,24 +43,24 @@
         <form asp-action="AddNewClient">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="Name" class="control-label" hidden title="Company"></label>
+                <input asp-for="Name" class="form-control" hidden title="Company"/>
+                <span asp-validation-for="Name" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
+                <label asp-for="FirstName" class="control-label" title="Person"></label>
+                <input asp-for="FirstName" class="form-control" title="Person"/>
+                <span asp-validation-for="FirstName" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Surname" class="control-label"></label>
-                <input asp-for="Surname" class="form-control" />
-                <span asp-validation-for="Surname" class="text-danger"></span>
+                <label asp-for="Surname" class="control-label" title="Person"></label>
+                <input asp-for="Surname" class="form-control" title="Person"/>
+                <span asp-validation-for="Surname" class="text-danger" title="Person"></span>
             </div>
             <div class="form-group">
-                <label asp-for="NIP" class="control-label"></label>
-                <input asp-for="NIP" class="form-control" />
-                <span asp-validation-for="NIP" class="text-danger"></span>
+                <label asp-for="NIP" class="control-label" hidden title="Company"></label>
+                <input asp-for="NIP" class="form-control" hidden title="Company"/>
+                <span asp-validation-for="NIP" class="text-danger" hidden title="Company"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Street" class="control-label"></label>
@@ -98,3 +98,32 @@
     <input class="Button" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Storage")'" />
 </div>
 
+<script>
+    var typeList = document.getElementById("TypeList");
+    var companyElements = document.querySelectorAll('[title="Company"]');
+    var personElements = document.querySelectorAll('[title="Person"]');
+    typeList.onchange = function (event)
+    {
+        var value = event.target.value;
+        if (value == "Company") {
+            //hide person elements
+            for (let i = 0; i < personElements.length; i++) {
+                personElements[i].hidden = true;
+            }
+            //show company elements
+            for (let i = 0; i < companyElements.length; i++) {
+                companyElements[i].hidden = false;
+            }
+        }
+        else {
+            //hide company elements
+                for (let i = 0; i < companyElements.length; i++) {
+                    companyElements[i].hidden = true;
+            }
+            //show person elements
+                for (let i = 0; i < personElements.length; i++) {
+                    personElements[i].hidden = false;
+            }
+        }
+    }
+</script>

@@ -108,7 +108,7 @@ namespace PetrolStation.Controllers
                 transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
             else //do transakcji została dołączona karta
             {
-                transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
+                transaction.IdLoyalityCard =Convert.ToInt32(transactionModel.IdLoyalityCard);
                 var pointsRequiredForPayment = transactionModel.TransactionValue * 100;
                 var CardToAddPoints = await _context.LoyalityCard.FindAsync(transaction.IdLoyalityCard);
                 if (transactionModel.CardPayment) //osoba chce zapłacić kartą

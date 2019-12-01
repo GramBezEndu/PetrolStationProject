@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetrolStation.Models;
+using PetrolStation.Models.ModelePomocnicze;
 
 namespace PetrolStation.Controllers
 {
@@ -22,7 +23,26 @@ namespace PetrolStation.Controllers
         public async Task<IActionResult> AddSupply()
         {
             ViewData["Produkty"] = await _context.Product.ToListAsync();
-            return View(await _context.Product.ToListAsync());
+
+            SupplyString supply = new SupplyString();
+            return View(supply);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddSupply(SupplyString supply)
+        {
+            if (supply.supplyString != null)
+            {
+                string[] IdProductsAndQuantity = supply.supplyString.Split(' ');
+                for (int i = 0; i < IdProductsAndQuantity.Length - 1; i += 2)
+                {
+                    int key = Convert.ToInt32(IdProductsAndQuantity[i]);
+                    var product = _context.Product.Find(key);
+                    product.QuantityInStorage =Convert.ToInt32(IdProductsAndQuantity[i + 1]);
+                    _context.Update(product);
+                }
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

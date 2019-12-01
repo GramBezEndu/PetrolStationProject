@@ -23,6 +23,7 @@ namespace PetrolStation.Controllers
         public async Task<IActionResult> AddSupply()
         {
             ViewData["Produkty"] = await _context.Product.ToListAsync();
+
             SupplyString supply = new SupplyString();
             return View(supply);
         }

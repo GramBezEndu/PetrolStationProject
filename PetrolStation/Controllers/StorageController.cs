@@ -18,15 +18,9 @@ namespace PetrolStation.Controllers
             _context = context;
         }
 
-        // GET: Temp
-        public IActionResult Index(Product product)
-        {
-            return View(product);
-        }
-
         public async Task<IActionResult> ViewProductList()
         {
-            return View(await _context.Product.ToListAsync());
+            return View(await _context.Product.OrderBy(x => x.Name).ToListAsync());
         }
 
         // GET: Temp/Details/5

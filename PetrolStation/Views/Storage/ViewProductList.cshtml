@@ -1,53 +1,71 @@
 ﻿@model IEnumerable<PetrolStation.Models.Product>
-
+@using System.Text.RegularExpressions
 @{
     ViewData["Title"] = "ViewProductList";
 }
+<style>
+    .Button {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+</style>
 
-<h1>ViewProductList</h1>
+<h1>Product list</h1>
 
 <p>
-    <a asp-action="AddProductForm">Add new product</a>
+    <input class="Button" type="button" value="Add new product" onclick="location.href='@Url.Action("AddProductForm", "Storage")'" />
+    @*<a asp-action="AddProductForm">Add new product</a>*@
 </p>
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.QuantityInStorage)
+                @*@Html.DisplayNameFor(model => model.QuantityInStorage)*@
+                @Regex.Replace(Html.DisplayNameFor(model => model.QuantityInStorage), "(\\B[A-Z])", " $1")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PriceInPoints)
+                @Regex.Replace(@Html.DisplayNameFor(model => model.PriceInPoints), "(\\B[A-Z])", " $1")
             </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.QuantityInStorage)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PriceInPoints)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdProduct">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdProduct">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdProduct">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuantityInStorage)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PriceInPoints)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

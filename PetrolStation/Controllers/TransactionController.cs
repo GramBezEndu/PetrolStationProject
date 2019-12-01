@@ -75,7 +75,7 @@ namespace PetrolStation.Controllers
             return View(transactionModel);
         }
 
-        
+
 
         //POST AddTransaction
         [HttpPost]
@@ -108,8 +108,8 @@ namespace PetrolStation.Controllers
                 transaction.IdLoyalityCard = null; //jeśli w transakcji nie wpisaliśmy karty- nie ma powiązania
             else //do transakcji została dołączona karta
             {
-                transaction.IdLoyalityCard = Convert.ToInt32(transactionModel.IdLoyalityCard);
-                var pointsRequiredForPayment = Convert.ToDecimal(transactionModel.TransactionValue) * 100;
+                transaction.IdLoyalityCard = transactionModel.IdLoyalityCard;
+                var pointsRequiredForPayment = transactionModel.TransactionValue * 100;
                 var CardToAddPoints = await _context.LoyalityCard.FindAsync(transaction.IdLoyalityCard);
                 if (transactionModel.CardPayment) //osoba chce zapłacić kartą
                 {
@@ -134,6 +134,7 @@ namespace PetrolStation.Controllers
                     CardToAddPoints.ActualPoints += Convert.ToInt32(transactionModel.TransactionValue) / 10;
                     _context.Update(CardToAddPoints);
                 }
+
             }
             Transaction thisTransaction;
             TransactionInvoice transactionInvoice = new TransactionInvoice();

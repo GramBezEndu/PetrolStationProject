@@ -36,13 +36,41 @@
         text-align: center;
     }
 
+    table.scroll th:nth-child(1) {
+        width: 20%;
+    }
+
+    table.scroll th:nth-child(2) {
+        width: 40%;
+    }
+
+    table.scroll th:nth-child(3) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(4) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(5) {
+        width: 10%;
+        text-align: right;
+    }
+
+    table.scroll th:nth-child(6) {
+        width: 10%;
+        text-align: right;
+    }
+
     table.scroll tbody th:nth-child(4) {
         padding-bottom: 0;
     }
 
     table.scroll tbody th:nth-child(4) input {
         display: inline-block;
-        width: 30%;
+        width: 100%;
     }
 
     table.scroll tbody th:last-child {
@@ -116,6 +144,10 @@
         margin: unset;
     }
 
+    .autofill input {
+        border-color: #1861ac;
+    }
+
     .autofill_list {
         position: absolute;
         z-index: 99;
@@ -169,13 +201,18 @@
         cursor: pointer;
         background-color: #fff;
         width: auto;
+        height:auto;
     }
 
-    .autofill-items div:hover {
+    .autofill div p {
+        margin: 0;
+    }
+
+    .autofill_list div:hover {
         background-color: #e9e9e9;
     }
 
-    .autofill-active {
+    .autofill_active {
         background-color: DodgerBlue !important;
         color: #ffffff;
     }
@@ -235,7 +272,7 @@
                 <tr>
                     <th>Kod</th>
                     <th>Nazwa</th>
-                    <th>Cena produktu</th>
+                    <th>Cena</th>
                     <th>Ilość</th>
                     <th>Suma</th>
                     <th>Usuń</th>
@@ -284,15 +321,15 @@
                     <input id="client_hidden" asp-for="@Model.client.IdClient" hidden="hidden"/>
                 </div>
                 <br/><br/>
-                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Nazwa">
-                <input id="nip" asp-for="@Model.client.NIP" class="form-control" placeholder="NIP">
-                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="Imię">
-                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Nazwisko">
-                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Ulica">
-                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="Numer domu">
-                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Numer mieszkania">
-                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Kod poccztowy">
-                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="Miasto">
+                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Nazwa" oninput="removeSelected()">
+                <input id="nip" asp-for="@Model.client.NIP" class="form-control" placeholder="NIP" oninput="removeSelected()">
+                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="Imię" oninput="removeSelected()">
+                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Nazwisko" oninput="removeSelected()">
+                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Ulica" oninput="removeSelected()">
+                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="Numer domu" oninput="removeSelected()">
+                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Numer mieszkania" oninput="removeSelected()">
+                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Kod poccztowy" oninput="removeSelected()">
+                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="Miasto" oninput="removeSelected()">
             </div>
         </div>
 
@@ -338,19 +375,28 @@
             if (properties.length < 1) { return null; }
             let element = document.createElement("div");
             element.classList.add("form-control");
-            element.innerHTML = "";
+            let column;
             for (let property of this.hinted) {
+                column = document.createElement("p");
+                let temp = this.hinted.length;
+                if (this.hinted.length === 9) {
+                    temp = 3;
+                }
+                temp = temp.toString();
+                column.setAttribute("style", "display: inline-block; width: calc(100% / " + temp + ");")
+                column.innerHTML = "";
                 //console.log(properties);
                 //console.log(property);
                 if (properties.includes(property)) {
                     //console.log(this[property]);
-                    element.innerHTML += "<strong>" + this[property].toString().substr(0, value.length) + "</strong>";
-                    element.innerHTML += this[property].toString().substr(value.length) + "\t";
+                    column.innerHTML += "<strong>" + this[property].toString().substr(0, value.length) + "</strong>";
+                    column.innerHTML += this[property].toString().substr(value.length) + "\t";
                 } else if (this[property] != null) {
-                    element.innerHTML += this[property].toString() + "\t";
+                    column.innerHTML += this[property].toString() + "\t";
                 } else {
-                    element.innerHTML += "\t";
+                    column.innerHTML += "\t";
                 }
+                element.appendChild(column);
             }
             return element;
         }
@@ -661,6 +707,12 @@
         document.getElementById("form").submit();
     });
 
+    function removeSelected() {
+        client_input.value = "Nowy klient";
+        client_input.data = null;
+        document.getElementById("client_hidden").value = "";
+    }
+
     function payWithCard() {
         let id = card_input.value;
         let cardCheckbox = document.getElementById("pay_with_card");
@@ -788,6 +840,23 @@
 
         let highlighted;
 
+        input.addEventListener("focus", function (e) {
+            if (this.id == "client_id") {
+                client_input.data = null;
+                document.getElementById("client_hidden").value = "";
+                document.getElementById("name").value = "";
+                document.getElementById("nip").value = "";
+                document.getElementById("first_name").value = "";
+                document.getElementById("surname").value = "";
+                document.getElementById("street").value = "";
+                document.getElementById("house_number").value = "";
+                document.getElementById("apartment_number").value = "";
+                document.getElementById("postal_code").value = "";
+                document.getElementById("city").value = "";
+            }
+            input.value = "";
+        });
+
         input.addEventListener("input", function (e) {
             let object_list = object.getList();
             this.data = null;
@@ -838,7 +907,7 @@
                         break;
                     case "client_id":
                         y.addEventListener("click", function (e) {
-                            input.value = object_list[i]["id"];
+                            input.value = "Klient z listy (id = " + object_list[i]["id"] + ")";
                             input.data = object_list[i]["id"];
                             document.getElementById("client_hidden").value = object_list[i]["id"];
                             document.getElementById("name").value = object_list[i]["name"];
@@ -900,12 +969,12 @@
             removeActive(list);
             if (highlighted >= list.length) highlighted = 0;
             if (highlighted < 0) highlighted = (list.length - 1);
-            list[highlighted].classList.add("autofill-active");
+            list[highlighted].classList.add("autofill_active");
         }
 
         function removeActive(list) {
             for (var i = 0; i < list.length; i++) {
-                list[i].classList.remove("autofill-active");
+                list[i].classList.remove("autofill_active");
             }
         }
     }

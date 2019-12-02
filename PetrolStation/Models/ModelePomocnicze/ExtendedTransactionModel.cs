@@ -44,7 +44,7 @@ namespace PetrolStation.Models.ModelePomocnicze
                 if (IsInvoice)
                     return "Invoice";
                 else
-                    return "Transaction";
+                    return "Receipt";
             }
         }
         public decimal PriceWholeTransaction

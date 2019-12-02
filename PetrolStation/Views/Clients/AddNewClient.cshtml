@@ -45,10 +45,10 @@
     </select>
 </div>
 @*car button*@
-<div class="AddCarHeader">
+@*<div class="AddCarHeader">
     <h4 style="position: absolute; margin-top:150px; margin-left:370px; width:200px">Add assigned car</h4>
     <input style="width:40px; height:40px; margin-top:145px; margin-left:560px" type="button" class="Button" value="+" id="AddCar" />
-</div>
+</div>*@
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -98,6 +98,10 @@
                 <label asp-for="Locality" class="control-label"></label>
                 <input asp-for="Locality" class="form-control" />
                 <span asp-validation-for="Locality" class="text-danger"></span>
+            </div>
+            <div style="position:relative">
+                <h4>Add loyality card</h4>
+                <input style="position:absolute; margin-left:190px; margin-top:-35px; width:30px; height:30px;" type="checkbox" />
             </div>
             <div class="form-group">
                 <input type="submit" value="Add client" class="Button" />

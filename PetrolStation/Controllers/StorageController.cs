@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PetrolStation.Models;
+using PetrolStation.Models.ModelePomocnicze;
 
 namespace PetrolStation.Controllers
 {
@@ -52,13 +55,31 @@ namespace PetrolStation.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProductForm([Bind("IdProduct,Name,QuantityInStorage,Price,PriceInPoints")] Product product)
+        public async Task<IActionResult> AddProductForm([Bind("IdProduct,Name,QuantityInStorage,Price,PriceInPoints")] ProductString product)
         {
+            //Debug.WriteLine(product.Price);
+            try
+            {
+                decimal x = Convert.ToDecimal(product.Price);
+            }
+            catch(Exception)
+            {
+                return View(product);
+            }
+            Product p = new Product()
+            {
+                IdProduct = product.IdProduct,
+                Name = product.Name,
+                QuantityInStorage = product.QuantityInStorage,
+                Price = Convert.ToDecimal(product.Price),
+                PriceInPoints = product.PriceInPoints
+            };
+            //product.Price = Convert.ToDecimal(product.Price.ToString().Replace(".", ","));
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(p);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), product);
+                return RedirectToAction("ViewProductList");
                 //return View(product);
             }
             return View(product);

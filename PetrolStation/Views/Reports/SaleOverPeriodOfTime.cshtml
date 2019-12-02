@@ -3,28 +3,28 @@
     ViewData["Title"] = "SaleOverPeriodOfTime";
 }
 
-<h1>Sprzedaż w wybranym okresie</h1>
+<h1>Sales in time period</h1>
 <form asp-action="SaleOverPeriodOfTime">
-    <label>Sortuj według:</label>
+    <label>Sort by:</label>
     <select asp-for="@Model.Order" class="form-control" style="width:210px">
-        <option value="1">Id</option>
-        <option value="2">Nazwy</option>
-        <option value="3">Ilości sprzedanych</option>
+        <option value="1">ID</option>
+        <option value="2">Name</option>
+        <option value="3">Quantity sold</option>
     </select>
-    <label asp-for="@Model.PoczatekPrzedzialu">Data początkowa</label>
+    <label asp-for="@Model.PoczatekPrzedzialu">Date from</label>
     <input asp-for="@Model.PoczatekPrzedzialu" class="form-control" style="width:210px" />
     <br />
-    <label asp-for="@Model.KoniecPrzedzialu">Data końcowa</label>
+    <label asp-for="@Model.KoniecPrzedzialu">Date to</label>
     <input asp-for="@Model.KoniecPrzedzialu" class="form-control" style="width:210px" />
     <br />
-    <input type="submit" value="Generuj" class="btn btn-primary" />
+    <input type="submit" value="Generate" class="btn btn-primary" />
 </form>
 <table class="table table-hover">
     <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nazwa produktu</th>
-            <th scope="col">Ilość sprzedanych</th>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Quantity sold</th>
         </tr>
     </thead>
     <tbody>

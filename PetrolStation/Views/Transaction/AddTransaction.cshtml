@@ -247,12 +247,12 @@
         }
         <table class="table table-striped">
             <tr>
-                <th scope="col">Numer dystrybutora</th>
-                <th scope="col">Nazwa paliwa</th>
-                <th scope="col">Ilość</th>
-                <th scope="col">Cena za litr</th>
-                <th scope="col">Wartość brutto</th>
-                <th scope="col">Rozliczyć?</th>
+                <th scope="col">Pump number</th>
+                <th scope="col">Fuel name</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price per liter</th>
+                <th scope="col">Sum</th>
+                <th scope="col">Add</th>
             </tr>
             @if (Model.purchasedFueling.Count != 0)
             {
@@ -275,12 +275,12 @@
         <table class="scroll table table-striped" id="bought_list">
             <thead>
                 <tr>
-                    <th>Kod</th>
-                    <th>Nazwa</th>
-                    <th>Cena</th>
-                    <th>Ilość</th>
-                    <th>Suma</th>
-                    <th>Usuń</th>
+                    <th>Barcode</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Sum</th>
+                    <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
@@ -288,16 +288,16 @@
             </tbody>
         </table>
         <div style="text-align: right;">
-            <h5 style="display: inline;">razem:</h5><h2 id="sum"></h2>
+            <h5 style="display: inline;">total:</h5><h2 id="sum"></h2>
         </div>
         <div class="width100">
             <div class="width75">
                 <div class="autofill">
-                    <input id="product_id" class="form-control" placeholder="Wyszukiwanie produktu">
+                    <input id="product_id" class="form-control" placeholder="Search Products">
                 </div>
             </div>
             <div class="width25">
-                <input type="button" class="btn btn-primary" value="Dodaj" id="add_product"/>
+                <input type="button" class="btn btn-primary" value="Add" id="add_product"/>
             </div>
 
             <input id="bought_input" asp-for="@Model.boughtString" hidden ="hidden" />
@@ -305,36 +305,36 @@
             <br/><br/>
             <div class="width50L">
                 <div class="autofill">
-                    <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Numer karty stałego klienta">
+                    <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Loyalty Card Number">
                 </div>
                 <div>
                     <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
-                    <label id="pay_with_card_text">Płatność punktami</label>
+                    <label id="pay_with_card_text">Pay With Points</label>
                 </div>
                 <div class="autofill">
-                    <input id="car_id" class="form-control" placeholder="Numery tablicy rejestracyjnej samochodu">
+                    <input id="car_id" class="form-control" placeholder="Registration Plate Number">
                     <input id="car_hidden" asp-for="@Model.clientCar.IdCar" hidden="hidden"/>
                 </div>
                 <div>
-                    <input id="show_invoice" type="button" value="Faktura" checked="" class="btn btn-primary">
+                    <input id="show_invoice" type="button" value="Invoice" checked="" class="btn btn-primary">
                 </div>
             </div>
 
             <div id="invoice" class="width50R" hidden="hidden">
                 <div class="autofill">
-                    <input id="client_id" class="form-control" placeholder="Wyszukiwanie klienta">
+                    <input id="client_id" class="form-control" placeholder="Search Client">
                     <input id="client_hidden" asp-for="@Model.client.IdClient" hidden="hidden"/>
                 </div>
                 <br/><br/>
-                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Nazwa" oninput="removeSelected()">
+                <input id="name" asp-for="@Model.client.Name"class="form-control" placeholder="Name" oninput="removeSelected()">
                 <input id="nip" asp-for="@Model.client.NIP" class="form-control" placeholder="NIP" oninput="removeSelected()">
-                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="Imię" oninput="removeSelected()">
-                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Nazwisko" oninput="removeSelected()">
-                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Ulica" oninput="removeSelected()">
-                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="Numer domu" oninput="removeSelected()">
-                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Numer mieszkania" oninput="removeSelected()">
-                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Kod poccztowy" oninput="removeSelected()">
-                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="Miasto" oninput="removeSelected()">
+                <input id="first_name" asp-for="@Model.client.FirstName" class="form-control" placeholder="First Name" oninput="removeSelected()">
+                <input id="surname" asp-for="@Model.client.Surname" class="form-control" placeholder="Surname" oninput="removeSelected()">
+                <input id="street" asp-for="@Model.client.Street" class="form-control" placeholder="Street" oninput="removeSelected()">
+                <input id="house_number" asp-for="@Model.client.HouseNumber" class="form-control" placeholder="House Number" oninput="removeSelected()">
+                <input id="apartment_number" asp-for="@Model.client.ApartmentNumber" class="form-control" placeholder="Apartment Number" oninput="removeSelected()">
+                <input id="postal_code" asp-for="@Model.client.Postcode" class="form-control" placeholder="Postcode" oninput="removeSelected()">
+                <input id="city" asp-for="@Model.client.Locality" class="form-control" placeholder="City" oninput="removeSelected()">
             </div>
         </div>
 
@@ -346,7 +346,7 @@
         <br/>
         <input asp-for="@Model.IsInvoice" id="IsInvoice" hidden/>
         <div class="width100">
-            <input type="button" id="send" value="Zatwierdź transakcję" class="btn btn-primary"/>
+            <input type="button" id="send" value="Confirm Transaction" class="btn btn-primary"/>
         </div>
     </form>
 </div>

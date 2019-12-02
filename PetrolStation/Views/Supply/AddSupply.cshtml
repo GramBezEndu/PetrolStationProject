@@ -1,10 +1,27 @@
-﻿
+@model PetrolStation.Models.ModelePomocnicze.SupplyString
 @{
     ViewData["Title"] = "AddSupply";
 }
 
 <style>
     * { box-sizing: border-box; }
+
+.do_zamiany{
+      display: block;
+      width: 100%;
+      height: calc(1.5em + 0.75rem + 2px);
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: #495057;
+      background-color: #fff;
+      background-clip: padding-box;
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 body {
   font: 16px Arial;
 }
@@ -55,9 +72,10 @@ input[type=submit] {
 }
 </style>
 
-
+<div id="body">
 <h1>AddSupply</h1>
 <form asp-action="AddSupply" id="form" autocomplete="off">
+    <div style='overflow:auto; width:1000px;height:300px;'>
     <table class="table table-striped">
         <tr>
             <th scope="col">Id</th>
@@ -65,21 +83,35 @@ input[type=submit] {
             <th scope="col">Quantity in storage</th>
             <th scope="col">Quantity in supply</th>
             <th scope="col">Total quantity</th>
+            <th scope="col">Remove</th>
         </tr>
         <tbody id="supply_table">
 
         </tbody>
     </table>
+        </div>
     <br />
     <div class="autocomplete">
     <label>Produkt</label>
     <input id="product_id" />
-    <input type="button" id="add_product" value="Dodaj produkt"/>
+        <label>Ilość</label>
+        <input id="ilosc_dostawy" />
+    <input type="button" id="add_product" value="Dodaj produkt" class="btn btn-primary"/>
+        <input type="button" value="Zatwierdź dostawę"  class="btn btn-success" id="zatwierdz"/>
         </div>
+    <input asp-for="@Model.supplyString" id="supplyString" hidden/>
 </form>
-
+    </div>
 
 <script>
+
+    class Supply {
+        constructor(id, ilosc) {
+            this.id = parseInt(id);
+            this.ilosc = ilosc;
+        }
+    }
+
     let product_button = document.getElementById("add_product")
     let product_input = document.getElementById("product_id");
     let produkty = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Produkty));
@@ -96,17 +128,24 @@ input[type=submit] {
     }
 
     var IdDodanegoProduktu = -1;
+    document.getElementById("ilosc_dostawy").value = "1";
 
     product_button.addEventListener("click", function (e) {
         let product;
         for (let i = 0; i < productList.length; i++) {
             if (productList[i].IdProduct == IdDodanegoProduktu) {
                 product = productList[i];
+                break;
             }
         }
-
-        if (IdDodanegoProduktu != -1) {
-            createElement(product.IdProduct, 1, product.Name, product.QuantityInStorage, 22, 44);
+        
+        if (IdDodanegoProduktu != -1 && document.getElementById("product_id").value == product.Name) {
+            if (!productsAddedToSupplyContains(product)) {
+                createElement(product.IdProduct, product.Name, product.QuantityInStorage, parseInt(document.getElementById("ilosc_dostawy").value));
+                productsAddedToSupply.push(new Supply(product.IdProduct, parseInt(document.getElementById("ilosc_dostawy").value) + parseInt(product.QuantityInStorage)));
+                IdDodanegoProduktu = -1;
+                document.getElementById("ilosc_dostawy").value = "1";
+            }
         }
     });
 
@@ -141,12 +180,12 @@ input[type=submit] {
           b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
           b.innerHTML += arr[i].substr(val.length);
             /*insert a input field that will hold the current array item's value:*/
-            b.innerHTML += "<input type='hidden' value='" + productList[i].Name + "'>";
-            IdDodanegoProduktu = parseInt(productList[i].IdProduct);
+            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
-              b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
+            b.addEventListener("click", function (e) {
+                IdDodanegoProduktu = parseInt(this.getElementsByTagName("input")[0].value.split(" ")[0]);
+                /*insert the value for the autocomplete text field:*/
+                inp.value = productNameForId(IdDodanegoProduktu);
               /*close the list of autocompleted values,
               (or any other open lists of autocompleted values:*/
               closeAllLists();
@@ -217,12 +256,127 @@ document.addEventListener("click", function (e) {
     function createElement(id, name, storage, supply) {
         let parent = document.getElementById("supply_table");
         let newTr = document.createElement("tr");
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 3; i++) {
             let newTd = document.createElement("td");
-            let tekst = document.createTextNode(arguments[i - 1] + arguments[i]);
+            let tekst = document.createTextNode(arguments[i]);
             newTd.appendChild(tekst);
             newTr.appendChild(newTd);
         }
+        let par = document.createElement("p");
+        let tekst = document.createTextNode(supply);
+        par.appendChild(tekst);
+        par.setAttribute('id', id);
+        par.setAttribute("class", "par");
+        par.setAttribute('onclick', 'createInput(this)');
+        let newTd = document.createElement("td");
+        newTd.appendChild(par);
+        newTr.appendChild(newTd);
+
+        newTd = document.createElement("td");
+        newTd.setAttribute('id', "total" + id);
+        tekst = document.createTextNode(storage + supply);
+        newTd.appendChild(tekst);
+        newTr.appendChild(newTd);
+
+
+        newTd = document.createElement("td");
+        let removeButton = document.createElement("input");
+        removeButton.type = "button";
+        removeButton.setAttribute("class", "btn btn-danger");
+        removeButton.value = "Usuń";
+        removeButton.onclick = function () {
+            document.getElementById("tr" + id).remove();
+            for (let i = 0; i < productsAddedToSupply.length; i++) {
+                if (productsAddedToSupply[i].id == id) {
+                    let remove = productsAddedToSupply.splice(i, 1);
+                    document.getElementById("product_id").value = "";
+                    break;
+                }
+            }
+
+        };
+        newTd.appendChild(removeButton);
+        newTr.appendChild(newTd);
+
+        newTr.setAttribute("id", "tr" + id);
         parent.appendChild(newTr);
     }
+
+    function productsAddedToSupplyContains(product) {
+        if (product == null) {
+            return true;
+        }
+        for (let i = 0; i < productsAddedToSupply.length; i++) {
+            if (productsAddedToSupply[i].id == product.IdProduct) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function createInput(elem) {
+        console.log(elem.textContent)
+        let input = document.createElement("input");
+        input.type = "number";
+        input.setAttribute('min', '0');
+        input.style.width = "70px";
+        input.value = parseInt(elem.textContent);
+        input.setAttribute('id', elem.id);
+        input.setAttribute('class', 'do_zamiany');
+        elem.parentNode.replaceChild(input, elem);
+    };
+
+    document.getElementById("body").onclick = function (ev) {
+        if (ev.target.className == "do_zamiany" || ev.target.className == "par") {
+            console.log("weszlo")
+            return;
+        }
+        let inputs = document.getElementsByClassName("do_zamiany");
+        console.log(inputs);
+        for (let i = 0; i < inputs.length; i++) {
+            document.getElementById("total" + inputs[i].id).innerHTML = parseInt(inputs[i].value) + liczbaOdId(inputs[i].id);
+            let total = parseInt(document.getElementById("total" + inputs[i].id).textContent);
+            console.log(inputs[i].id + " " + total);
+            productsAddedToSupply[indexDlaId(inputs[i].id)].ilosc = total;
+            let paragraf = document.createElement("p")
+            let text = document.createTextNode(inputs[i].value);
+            paragraf.appendChild(text);
+            paragraf.setAttribute('id', inputs[i].id);
+            paragraf.setAttribute("class","par");
+            paragraf.setAttribute('onclick', 'createInput(this)');
+            inputs[i].parentNode.replaceChild(paragraf, inputs[i]);
+            //tutaj
+        }
+    }
+
+    function productNameForId(id) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].IdProduct == id) {
+                return productList[i].Name;
+            }
+        }
+    }
+
+    function indexDlaId(idproduct) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productsAddedToSupply[i].id == idproduct) {
+                return parseInt(i);
+            }
+        }
+    }
+
+    function liczbaOdId(productid) {
+        for (let i = 0; i < productList.length; i++) {
+            if (productList[i].IdProduct == productid) {
+                return parseInt(productList[i].QuantityInStorage);
+            }
+        }
+    }
+
+    document.getElementById("zatwierdz").addEventListener("click", function () {
+        for (let i = 0; i < productsAddedToSupply.length; i++) {
+            document.getElementById("supplyString").value += productsAddedToSupply[i].id + " " + productsAddedToSupply[i].ilosc + " ";
+        }
+        document.getElementById("form").submit();
+    });
 </script>

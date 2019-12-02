@@ -1,0 +1,55 @@
+﻿@model PetrolStation.Models.ModelePomocnicze.CarManage.CarManageModel
+@{
+    ViewData["Title"] = "CarManage";
+}
+
+<h1>CarManage</h1>
+<h6>In this interface you can add or remove a car to client</h6>
+@if (ViewBag.Information != null)
+{
+    <p style="color:darkgreen; font-size:medium; font:bold">@ViewBag.Information</p>
+}
+<form asp-action="CarManage">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Number plate</th>
+                <th scope="col">Car brand</th>
+                <th scope="col">Car model</th>
+                <th scope="col">Remove?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.cars.Count; i++)
+            {
+                <tr>
+                    <th scope="row">@Model.cars[i].NumberPlate</th>
+                    <td>@Model.cars[i].CarBrand</td>
+                    <td>@Model.cars[i].CarModel</td>
+                    <td><a asp-action="RemoveCar" asp-route-idCar="@Model.cars[i].IdCar" class="btn btn-danger">Remove</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h6>Add new car to client</h6>
+    <label asp-for="@Model.carToAdd.NumberPlate">Number plate</label>
+    <input asp-for="@Model.carToAdd.NumberPlate" class="form-control" style="width:200px;" />
+    <label asp-for="@Model.carToAdd.CarBrand">Car brand</label>
+    <input asp-for="@Model.carToAdd.CarBrand" class="form-control" style="width:200px;"/>
+    <label asp-for="@Model.carToAdd.CarModel">Car model</label>
+    <input asp-for="@Model.carToAdd.CarModel" class="form-control" style="width:200px;"/>
+    <br />
+    <input type="submit" class="btn btn-primary" value="Add new car" />
+
+
+    @foreach (var item in Model.cars)
+    {
+        <input asp-for="@item.IdCar" hidden />
+        <input asp-for="@item.IdClient" hidden />
+        <input asp-for="@item.NumberPlate" hidden />
+        <input asp-for="@item.CarBrand" hidden />
+        <input asp-for="@item.CarModel" hidden />
+    }
+    <input asp-for="@Model.client.IdClient" hidden />
+</form>
+

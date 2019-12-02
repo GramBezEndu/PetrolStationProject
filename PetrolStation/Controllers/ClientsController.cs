@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using PetrolStation.ExtensionMethods;
 using PetrolStation.Models;
+using PetrolStation.Models.ModelePomocnicze.CarManage;
 
 namespace PetrolStation.Controllers
 {
@@ -118,6 +121,43 @@ namespace PetrolStation.Controllers
         private bool ClientExists(int id)
         {
             return _context.Client.Any(e => e.IdClient == id);
+        }
+
+        [HttpGet]
+        public IActionResult CarManage(int id)
+        {
+            CarManageModel carManageModel = new CarManageModel
+            {
+                client = _context.Client.Where(c => c.IdClient == id).ToList()[0],
+                cars = _context.Car.Where(car => car.IdClient == id).ToList()
+            };
+            return View(carManageModel);
+        }
+        //add new car
+        [HttpPost]
+        public async Task<IActionResult> CarManage(CarManageModel carManageModel)
+        {
+            if (carManageModel.carToAdd.NumberPlate == null)
+                return View(carManageModel);
+            carManageModel.carToAdd.IdClient = carManageModel.client.IdClient;
+            _context.Add(carManageModel.carToAdd);
+            await _context.SaveChangesAsync();
+            carManageModel.cars.Add(_context.Car.Where(c => c == carManageModel.carToAdd).ToList()[0]);
+            TempData.Put<CarManageModel>("CarManageModel", carManageModel);
+            ViewBag.Information = "Successfully added new car!";
+            var id = carManageModel.client.IdClient;
+            return RedirectToAction("CarManage",id);
+        }
+
+        public async Task<IActionResult> RemoveCar(int idCar)
+        {
+            var car = await _context.Car.FindAsync(idCar);
+            int id = car.IdClient;
+            car.IdClient = 10; //nie ma klienta
+            _context.Update(car);
+            await _context.SaveChangesAsync();
+            ViewBag.Information = "Successfully removed car!";
+            return RedirectToAction("CarManage", new RouteValueDictionary(new {controller="Clients", action="CarManage", id=id}));
         }
     }
 }

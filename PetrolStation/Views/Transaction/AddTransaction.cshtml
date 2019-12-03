@@ -70,7 +70,7 @@
 
     table.scroll tbody th:nth-child(4) input {
         display: inline-block;
-        width: 100%;
+        width: 70%;
     }
 
     table.scroll tbody th:last-child {
@@ -186,7 +186,13 @@
     }
 
     #pay_with_card_text {
-        margin: 40px 0 0 10px;
+        margin: 30px 0 50px 50px;
+    }
+
+    #pay_with_card {
+        transform: scale(1.9);
+        position: absolute;
+        margin: 33px 0 0 20px;
     }
 
     .form-control {
@@ -308,8 +314,12 @@
                     <input id="card_id" class="form-control" asp-for="@Model.IdLoyalityCard" placeholder="Loyalty Card Number">
                 </div>
                 <div>
-                    <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
-                    <label id="pay_with_card_text">Pay With Points</label>
+                    <div>
+                        <input type="checkbox" id="pay_with_card" asp-for="@Model.CardPayment" disabled ="disabled"/>
+                    </div>
+                    <div>
+                        <label id="pay_with_card_text">Pay With Points</label> <label id="points"></label>
+                    </div>
                 </div>
                 <div class="autofill">
                     <input id="car_id" class="form-control" placeholder="Registration Plate Number">
@@ -346,14 +356,9 @@
         <br/>
         <input asp-for="@Model.IsInvoice" id="IsInvoice" hidden/>
         <div class="width100">
-            <input type="button" id="send" value="Confirm Transaction" class="btn btn-primary"/>
+            <input type="button" id="send" value="Confirm Transaction" class="btn btn-success"/>
         </div>
     </form>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-
 </div>
 
 <script>
@@ -859,6 +864,10 @@
                 document.getElementById("postal_code").value = "";
                 document.getElementById("city").value = "";
             }
+            if (this.id == "card_id") {
+                payWithCard();
+                document.getElementById("points").innerHTML = "";
+            }
             input.value = "";
         });
 
@@ -867,6 +876,7 @@
             this.data = null;
             if (this.id == "card_id") {
                 payWithCard();
+                document.getElementById("points").innerHTML = "";
             }
             if (this.id == "car_id") {
                 document.getElementById("car_hidden").value = "";
@@ -901,6 +911,7 @@
                         y.addEventListener("click", function (e) {
                             input.value = object_list[i]["id"];
                             input.data = object_list[i]["clientId"];
+                            document.getElementById("points").innerHTML = " (" + object_list[i]["points"].toString() + ")";
                         });
                         break;
                     case "car_id":

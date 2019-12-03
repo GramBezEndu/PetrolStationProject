@@ -4,15 +4,18 @@
 @{
     ViewData["Title"] = "Index";
 }
+<div>
+    <h1>Client list</h1>
+    <h4 style="position: absolute; margin-top:-45px; margin-left:200px; width:300px">Select transaction type</h4>
+    <select id="ClientType" class="browser-default custom-select custom-select-lg mb-3" style="position: absolute; margin-top:-8px; margin-left:200px; width:250px">
+        <option>Person</option>
+        <option>Company</option>
+    </select>
+    <p>
+        <input class="btn btn-primary" type="button" value="Add new Client" onclick="location.href='@Url.Action("AddNewClient", "Clients")'" style="width: 165px;"/>
 
-<h1>Client list</h1>
-<select id="ClientType" class="browser-default custom-select custom-select-lg mb-3">
-    <option>Person</option>
-    <option>Company</option>
-</select>
-<p>
-    <a asp-action="AddNewClient">Add new client</a>
-</p>
+    </p>
+</div>
 <table class="table">
     <tbody class="Person">
         <tr>

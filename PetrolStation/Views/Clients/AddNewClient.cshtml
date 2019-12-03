@@ -104,15 +104,13 @@
                 <input style="position:absolute; margin-left:190px; margin-top:-35px; width:30px; height:30px;" type="checkbox" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Add client" class="Button" />
+                <input type="submit" value="Add client" class="btn btn-success" style="width: 100%;"/>
             </div>
+            <input class="btn btn-primary" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Clients")'" style="width: 100%;"/>
         </form>
     </div>
 </div>
 
-<div>
-    <input class="Button" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Clients")'" />
-</div>
 
 <script>
     var typeList = document.getElementById("TypeList");

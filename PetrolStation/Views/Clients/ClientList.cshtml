@@ -1,37 +1,35 @@
 ﻿@model IEnumerable<PetrolStation.Models.Client>
+@using System.Text.RegularExpressions
 
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
+<h1>Client list</h1>
+<select id="ClientType" class="browser-default custom-select custom-select-lg mb-3">
+    <option>Person</option>
+    <option>Company</option>
+</select>
 <p>
     <a asp-action="AddNewClient">Add new client</a>
 </p>
 <table class="table">
-    <thead>
+    <tbody class="Person">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Regex.Replace(Html.DisplayNameFor(model => model.FirstName), "(\\B[A-Z])", " $1")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Surname)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NIP)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Street)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HouseNumber)
+                @Regex.Replace(Html.DisplayNameFor(model => model.HouseNumber), "(\\B[A-Z])", " $1")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ApartmentNumber)
+                @Regex.Replace(Html.DisplayNameFor(model => model.ApartmentNumber), "(\\B[A-Z])", " $1")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Postcode)
@@ -41,43 +39,156 @@
             </th>
             <th></th>
         </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Surname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NIP)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Street)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HouseNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ApartmentNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Postcode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Locality)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdClient">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdClient">Details</a> |
-                <a asp-action="CarManage" asp-route-id="@item.IdClient" class="btn btn-success">Manage cars</a>
-            </td>
-        </tr>
-}
     </tbody>
+    <tbody class="Company" hidden>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NIP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Street)
+            </th>
+            <th>
+                @Regex.Replace(Html.DisplayNameFor(model => model.HouseNumber), "(\\B[A-Z])", " $1")
+            </th>
+            <th>
+                @Regex.Replace(Html.DisplayNameFor(model => model.ApartmentNumber), "(\\B[A-Z])", " $1")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Postcode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Locality)
+            </th>
+            <th></th>
+        </tr>
+    </tbody>
+    @*<tbody class="All">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Surname)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NIP)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Street)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.HouseNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ApartmentNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Postcode)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Locality)
+                </th>
+                <th></th>
+            </tr>
+        </tbody>*@
+    @foreach (var item in Model)
+    {
+        string clientType = "-";
+        if (item.NIP != null)
+        {
+            clientType = "Company";
+        }
+        else
+        {
+            clientType = "Person";
+        }
+        <tbody class="@clientType">
+            <tr>
+                @if (item.Name != null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                }
+                @if (item.FirstName != null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                }
+                @if (item.Surname != null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Surname)
+                    </td>
+                }
+                @if (item.NIP != null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NIP)
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Street)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HouseNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApartmentNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Postcode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Locality)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdClient">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdClient">Details</a> |
+                    <a asp-action="CarManage" asp-route-id="@item.IdClient" class="btn btn-success">Manage cars</a>
+                </td>
+            </tr>
+        </tbody>
+    }
 </table>
+
+<script>
+    window.onload = function () {
+        let companies = document.getElementsByClassName("Company");
+        let persons = document.getElementsByClassName("Person");
+        let clientTypeSelect = document.getElementById("ClientType");
+
+        //hide companies on default
+        for (let i = 0; i < companies.length; i++) {
+            companies[i].hidden = true;
+        }
+        //On select change
+        clientTypeSelect.onchange = function (event) {
+            var value = event.target.value;
+            if (value == "Company") {
+                for (let i = 0; i < persons.length; i++) {
+                    persons[i].hidden = true;
+                }
+                for (let i = 0; i < companies.length; i++) {
+                    companies[i].hidden = false;
+                }
+            }
+            else if (value == "Person") {
+                for (let i = 0; i < persons.length; i++) {
+                    persons[i].hidden = false;
+                }
+                for (let i = 0; i < companies.length; i++) {
+                    companies[i].hidden = true;
+                }
+            }
+        }
+    }
+</script>

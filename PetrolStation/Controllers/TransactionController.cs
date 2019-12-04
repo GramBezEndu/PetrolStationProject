@@ -221,12 +221,37 @@ namespace PetrolStation.Controllers
                         IdTransaction = thisTransaction.IdTransaction,
                         IdFueling = item.fueling.IdFueling,
                     };
+                    createFueling(item.fueling.IdGasPump);
                     _context.Add(fuelingList);
                     //??? Będziemy odejmować sprzedane paliwo ze zbiorników???
                 }
             }
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        private void createFueling(int idGasPump)
+        {
+            Random rnd = new Random();
+            var zbiornikiDys = _context.PumpTank.Where(pt => pt.IdGasPump == idGasPump)
+                .Select(pt=>pt.IdFuelTank)
+                .ToList();
+            var zbiorniki = _context.FuelTank.Where(ft => zbiornikiDys.Contains(ft.IdFuelTank))
+                .Select(ft => ft.IdFuel)
+                .ToList();
+            var paliwa = _context.Fuel.Where(f => zbiorniki.Contains(f.IdFuel)).ToList();
+            int rodzajPaliwa = rnd.Next(0, paliwa.Count());
+            decimal ilosc =Convert.ToDecimal(rnd.NextDouble() * Math.Abs(200-10) + 10);
+            ilosc = Math.Round(ilosc, 2);
+            Fueling randomFueling = new Fueling
+            {
+                Date = DateTime.Now,
+                IdFuel = paliwa[rodzajPaliwa].IdFuel,
+                IdGasPump = idGasPump,
+                Quantity = (float)ilosc
+            };
+            _context.Add(randomFueling);
+            _context.SaveChanges();
         }
     }
 }

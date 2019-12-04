@@ -38,6 +38,10 @@
 
 <div class="HeaderSite">
     <h1 style="position:absolute; margin-top:30px; width:300px">Add new client</h1>
+    @if (ViewBag.ErrorClient != null)
+    {
+        <p style="color:red">@ViewBag.ErrorClient</p>
+    }
     <h4 style="position: absolute; margin-top:15px; margin-left:300px; width:300px">Select client type</h4>
     <select class="browser-default custom-select custom-select-lg mb-3" id="TypeList" style="position: absolute; margin-top:45px; margin-left:300px; width:250px">
         <option>Person</option>

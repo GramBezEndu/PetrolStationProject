@@ -60,6 +60,16 @@ namespace PetrolStation.Controllers
         {
             if (ModelState.IsValid)
             {
+                if((client.NIP==null && client.Name!=null)||(client.NIP != null && client.Name == null)
+                    ||(client.FirstName==null && client.Surname!=null)||
+                    (client.FirstName != null && client.Surname == null)||
+                    (client.FirstName == null && client.Surname == null &&
+                    client.NIP == null && client.Name == null))
+                {
+                    ViewBag.ErrorClient = "Invalid customer data";
+                    return View(client);
+                }
+
                 _context.Add(client);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ClientList));

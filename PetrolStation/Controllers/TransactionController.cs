@@ -99,6 +99,23 @@ namespace PetrolStation.Controllers
                     purchasedProducts.Add(productQuantity);
                 }
             }
+            //!!!!!!!!!!!!!!!1wyliczenie ceny w backendzie
+            transactionModel.TransactionValue = 0;
+            foreach(var product in purchasedProducts)
+            {
+                transactionModel.TransactionValue +=(product.product.Price * product.Quantity);
+            }
+            foreach(var wybraneTankowanie in transactionModel.purchasedFueling)
+            {
+                if (wybraneTankowanie.IsChecked == true)
+                    transactionModel.TransactionValue += wybraneTankowanie.VelueOfFueling;
+            }
+
+
+            //!!!!!!!!!!!!!!!!!!1Wyliczenie ceny w backendzie
+
+
+
 
             Transaction transaction = new Transaction
             {

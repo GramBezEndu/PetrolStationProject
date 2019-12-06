@@ -178,7 +178,7 @@
         display: inline-block;
     }
 
-    #sum {
+    .sum {
         display:inline-block;
         width: 25%;
         margin-left: 20px;
@@ -294,7 +294,7 @@
             </tbody>
         </table>
         <div style="text-align: right;">
-            <h5 style="display: inline;">total:</h5><h2 id="sum"></h2>
+            <h5 style="display: inline;">total:</h5><div class="sum"><h2 id="sum" style="display: inline-block"></h2>  (<label id="pointsTotal"></label> points)</div>
         </div>
         <div class="width100">
             <div class="width75">
@@ -468,6 +468,18 @@
         getTotal() {
             this.calculateTotal();
             return this.total;
+        }
+
+        calculatePointsTotal() {
+            this.pointsTotal = 0;
+            for (let i in this.list) {
+                this.pointsTotal += this.list[i].points * this.numbers[i];
+            }
+        }
+
+        getPointsTotal() {
+            this.calculatePointsTotal();
+            return this.pointsTotal;
         }
 
         getList() {
@@ -661,6 +673,7 @@
     let invoice_button = document.getElementById("show_invoice");
 
     let total;
+    let pointsTotal;
 
     product_input.focus();
 
@@ -729,11 +742,10 @@
         let label = document.getElementById("pay_with_card_text");
         let list = cards.getList();
         let activate = false;
-        let temp = total * 100;
         for (let i = 0; i < list.length; i++) {
             if (list[i].id == id) {
-                if (temp > 0) {
-                    if (list[i].points >= temp) {
+                if (pointsTotal > 0) {
+                    if (list[i].points >= pointsTotal) {
                         activate = true;
                     }
                 }
@@ -808,13 +820,17 @@
             row.appendChild(cell);
             body.appendChild(row);
         }
-        row = document.createElement("tr");
-        for (let i = 0; i < 4; i++) {
-            row.appendChild(document.createElement("th"));
-        }
+        //row = document.createElement("tr");
+        //for (let i = 0; i < 4; i++) {
+        //    row.appendChild(document.createElement("th"));
+        //}
+        let fuellingPrice = fuelling();
         total = bought.getTotal();
-        total += fuelling();
+        total += fuellingPrice;
+        pointsTotal = bought.getPointsTotal();
+        pointsTotal += fuellingPrice * 100;
         document.getElementById("sum").innerText = (total.toFixed(2));
+        document.getElementById("pointsTotal").innerText = pointsTotal;
         payWithCard();
     }
 
@@ -824,7 +840,7 @@
         for (let checkbox of checkboxes) {
             if (checkbox.checked) {
                 let parent = checkbox.parentNode.parentNode;
-                price += parseFloat(parent.getElementsByTagName("td")[4].innerHTML);
+                price += parseFloat(parent.getElementsByTagName("td")[4].innerHTML.replace(",","."));
             }
         }
         return price;

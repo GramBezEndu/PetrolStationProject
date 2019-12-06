@@ -395,10 +395,7 @@
                 temp = temp.toString();
                 column.setAttribute("style", "display: inline-block; width: calc(100% / " + temp + ");")
                 column.innerHTML = "";
-                //console.log(properties);
-                //console.log(property);
                 if (properties.includes(property)) {
-                    //console.log(this[property]);
                     column.innerHTML += "<strong>" + this[property].toString().substr(0, value.length) + "</strong>";
                     column.innerHTML += this[property].toString().substr(value.length) + "\t";
                 } else if (this[property] != null) {
@@ -607,7 +604,7 @@
     class Client extends Item {
         constructor(id, name, firstName, surname, nip, street, houseNumber, apartmentNumber, postalCode, city) {
             super(["name", "surname", "nip"],
-                ["name", "surname", "nip", "firstName", "street", "houseNumber", "apartmentNumber", "postalCode", "city"]
+                ["firstName", "surname", "street", "name", "city", "houseNumber", "nip", "postalCode", "apartmentNumber"]
             );
             this.id = parseInt(id);
             this.name = name;
@@ -665,7 +662,10 @@
     let card_input = document.getElementById("card_id");
     let car_input = document.getElementById("car_id");
     let client_input = document.getElementById("client_id");
-    let fuellings = document.getElementsByTagName("table")[0].getElementsByTagName("input");
+    let name_input = document.getElementById("name");
+    let nip_input = document.getElementById("nip");
+    let first_name_input = document.getElementById("first_name");
+    let surname_input = document.getElementById("surname");
 
 
     let submit_button = document.getElementById("send");
@@ -683,6 +683,55 @@
     autofill(client_input, clients);
 
     updateBought();
+
+    name_input.addEventListener("input", function (e) {
+        if (name_input.value.length < 1 && nip_input.value.length < 1) {
+            first_name_input.disabled = false;
+            surname_input.disabled = false;
+        } else {
+            first_name_input.value = "";
+            surname_input.value = "";
+            first_name_input.disabled = true;
+            surname_input.disabled = true;
+        }
+    });
+
+    nip_input.addEventListener("input", function (e) {
+        if (name_input.value.length < 1 && nip_input.value.length < 1) {
+            first_name_input.disabled = false;
+            surname_input.disabled = false;
+        } else {
+            first_name_input.value = "";
+            surname_input.value = "";
+            first_name_input.disabled = true;
+            surname_input.disabled = true;
+        }
+    });
+
+    first_name_input.addEventListener("input", function (e) {
+        if (first_name_input.value.length < 1 && surname_input.value.length < 1) {
+            name_input.disabled = false;
+            nip_input.disabled = false;
+        } else {
+            name_input.value = "";
+            nip_input.value = "";
+            name_input.disabled = true;
+            nip_input.disabled = true;
+        }
+    });
+
+    surname_input.addEventListener("input", function (e) {
+        if (first_name_input.value.length < 1 && surname_input.value.length < 1) {
+            name_input.disabled = false;
+            nip_input.disabled = false;
+        } else {
+            name_input.value = "";
+            nip_input.value = "";
+            name_input.disabled = true;
+            nip_input.disabled = true;
+        }
+    });
+
 
     product_button.addEventListener("click", function (e) {
         if (!product_input.value) return;
@@ -723,9 +772,7 @@
         e.preventDefault();
         let return_bought = document.getElementById("bought_input");
         let transaction_value = document.getElementById("total");
-        console.log(total);
         transaction_value.value = total;
-        console.log(transaction_value.value);
         return_bought.value = bought.returnBought();
         document.getElementById("form").submit();
     });
@@ -803,7 +850,6 @@
                 } else {
                     cell.innerHTML = record[j];
                 }
-                //console.log(record[j]);
                 row.appendChild(cell);
             }
             cell = document.createElement("th");
@@ -820,10 +866,6 @@
             row.appendChild(cell);
             body.appendChild(row);
         }
-        //row = document.createElement("tr");
-        //for (let i = 0; i < 4; i++) {
-        //    row.appendChild(document.createElement("th"));
-        //}
         let fuellingPrice = fuelling();
         total = bought.getTotal();
         total += fuellingPrice;
@@ -870,15 +912,19 @@
             if (this.id == "client_id") {
                 client_input.data = null;
                 document.getElementById("client_hidden").value = "";
-                document.getElementById("name").value = "";
-                document.getElementById("nip").value = "";
-                document.getElementById("first_name").value = "";
-                document.getElementById("surname").value = "";
+                name_input.value = "";
+                nip_input.value = "";
+                first_name_input.value = "";
+                surname_input.value = "";
                 document.getElementById("street").value = "";
                 document.getElementById("house_number").value = "";
                 document.getElementById("apartment_number").value = "";
                 document.getElementById("postal_code").value = "";
                 document.getElementById("city").value = "";
+                name_input.disabled = false;
+                nip_input.disabled = false;
+                first_name_input.disabled = false;
+                surname_input.disabled = false;
             }
             if (this.id == "card_id") {
                 payWithCard();

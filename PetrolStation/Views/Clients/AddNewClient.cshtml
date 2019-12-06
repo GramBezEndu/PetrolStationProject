@@ -38,6 +38,10 @@
 
 <div class="HeaderSite">
     <h1 style="position:absolute; margin-top:30px; width:300px">Add new client</h1>
+    @if (ViewBag.ErrorClient != null)
+    {
+        <p style="color:red">@ViewBag.ErrorClient</p>
+    }
     <h4 style="position: absolute; margin-top:15px; margin-left:300px; width:300px">Select client type</h4>
     <select class="browser-default custom-select custom-select-lg mb-3" id="TypeList" style="position: absolute; margin-top:45px; margin-left:300px; width:250px">
         <option>Person</option>
@@ -101,10 +105,10 @@
             </div>
             <div style="position:relative">
                 <h4>Add loyalty card</h4>
-                <input style="position:absolute; margin-left:190px; margin-top:-35px; width:30px; height:30px;" type="checkbox" />
+                <input id="CardCheckbox" style="position:absolute; margin-left:190px; margin-top:-35px; width:30px; height:30px;" type="checkbox" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Add client" class="btn btn-success" style="width: 100%;"/>
+                <input id="SubmitButton" type="submit" value="Add client" class="btn btn-success" style="width: 100%;" asp-route-addCard="false"/>
             </div>
             <input class="btn btn-primary" type="button" value="View client list" onclick="location.href='@Url.Action("ClientList", "Clients")'" style="width: 100%;"/>
         </form>
@@ -139,15 +143,28 @@
             }
         }
     }
-    //Add car section
-    var button = document.getElementById("AddCar");
-    button.onclick = function (event) {
-        var value = event.target.value;
-        if (value == "+") {
-            event.target.value = '+';
+    ////Add car section
+    //var button = document.getElementById("AddCar");
+    //button.onclick = function (event) {
+    //    var value = event.target.value;
+    //    if (value == "+") {
+    //        event.target.value = '+';
+    //    }
+    //    else {
+    //        event.target.value = '+';
+    //    }
+    //}
+    //
+    let cardChecbox = document.getElementById("CardCheckbox");
+    let sumbitButton = document.getElementById("SubmitButton");
+    cardChecbox.onchange = function (event) {
+        if (cardChecbox.checked == true) {
+            console.log("Card: true");
+            sumbitButton.setAttribute('formaction', "/Clients/AddNewClient?addCard=true");
         }
         else {
-            event.target.value = '+';
+            console.log("Card: false");
+            sumbitButton.setAttribute('formaction', "/Clients/AddNewClient?addCard=false");
         }
     }
 </script>

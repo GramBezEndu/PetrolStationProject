@@ -24,6 +24,7 @@ namespace PetrolStation.Controllers
         // GET: Clients
         public async Task<IActionResult> ClientList()
         {
+            ViewBag.IdClientsWithCard = await _context.LoyalityCard.ToListAsync();
             return View(await _context.Client.ToListAsync());
         }
 
@@ -56,18 +57,62 @@ namespace PetrolStation.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddNewClient([Bind("IdClient,Name,FirstName,Surname,NIP,Street,HouseNumber,ApartmentNumber,Postcode,Locality")] Client client)
+        public async Task<IActionResult> AddNewClient([Bind("IdClient,Name,FirstName,Surname,NIP,Street,HouseNumber,ApartmentNumber,Postcode,Locality")] Client client, bool addCard)
         {
             if (ModelState.IsValid)
             {
+                if((client.NIP==null && client.Name!=null)||(client.NIP != null && client.Name == null)
+                    ||(client.FirstName==null && client.Surname!=null)||
+                    (client.FirstName != null && client.Surname == null)||
+                    (client.FirstName == null && client.Surname == null &&
+                    client.NIP == null && client.Name == null))
+                {
+                    ViewBag.ErrorClient = "Invalid customer data";
+                    return View(client);
+                }
+                if(client.NIP != null && client.Name != null && (client.FirstName != null || client.Surname != null))
+                {
+                    ViewBag.ErrorClient = "Invalid customer data";
+                    return View(client);
+                }
+                if(client.FirstName != null && client.Surname != null && (client.NIP != null || client.Name != null))
+                {
+                    ViewBag.ErrorClient = "Invalid customer data";
+                    return View(client);
+                }
+
                 _context.Add(client);
                 await _context.SaveChangesAsync();
+                //get added client from database
+                if(addCard)
+                {
+                    var addedClient = _context.Client.Where(x => x.IdClient == client.IdClient).FirstOrDefault();
+                    var newCard = new LoyalityCard()
+                    {
+                        IdClient = addedClient.IdClient,
+                        ActualPoints = 0
+                    };
+                    _context.Add(newCard);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(ClientList));
             }
             return View(client);
         }
 
-        // GET: Clients/Edit/5
+        public async Task<IActionResult> AddCard(int id)
+        {
+            var addedClient = _context.Client.Where(x => x.IdClient == id).FirstOrDefault();
+            var newCard = new LoyalityCard()
+            {
+                IdClient = addedClient.IdClient,
+                ActualPoints = 0
+            };
+            _context.Add(newCard);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(ClientList));
+        }
+        //GET: Clients/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

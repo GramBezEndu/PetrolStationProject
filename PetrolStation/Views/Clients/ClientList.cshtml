@@ -40,7 +40,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.Locality)
             </th>
-            <th></th>
+            <th>
+
+            </th>
+            <th>
+
+            </th>
+            <th>
+
+            </th>
         </tr>
     </tbody>
     <tbody class="Company" hidden>
@@ -66,7 +74,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Locality)
             </th>
-            <th></th>
+            <th>
+
+            </th>
+            <th>
+
+            </th>
         </tr>
     </tbody>
     @*<tbody class="All">
@@ -154,9 +167,16 @@
                     @Html.DisplayFor(modelItem => item.Locality)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.IdClient">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.IdClient">Details</a> |
-                    <a asp-action="CarManage" asp-route-id="@item.IdClient" class="btn btn-success">Manage cars</a>
+                    <a asp-action="Edit" asp-route-id="@item.IdClient" class="btn btn-primary">Edit</a>
+                </td>
+                <td>
+                    <button asp-action="AddLoyaltyCard" asp-route-id="@item.IdClient" 
+                       onclick="@("window.location.href='" + @Url.Action("AddCard", "Clients", 
+                                new {id = item.IdClient }) + "'");" 
+                    clientId="@item.IdClient" data-input-to-disable="true" class="btn btn-primary" style="width: 120px;">Add card</button>
+                </td>
+                <td>
+                    <a asp-action="CarManage" asp-route-id="@item.IdClient" class="btn btn-primary" style="width:135px">Manage cars</a>
                 </td>
             </tr>
         </tbody>
@@ -191,6 +211,25 @@
                 for (let i = 0; i < companies.length; i++) {
                     companies[i].hidden = true;
                 }
+            }
+        }
+        //
+        let viewbagId = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.IdClientsWithCard));
+        let idClientsWithCard = new Array();
+        for (let i = 0; i < viewbagId.length; i++) {
+            idClientsWithCard.push(viewbagId[i].IdClient);
+        }
+        console.log(idClientsWithCard);
+        let inputsToDisable = document.querySelectorAll('[data-input-to-disable="true"]');
+        //console.log(inputsToDisable[0].getAttribute("clientId"));
+        for (let i = 0; i < inputsToDisable.length; i++) {
+            console.log("\tidClientsWithCard [" + i + "]: " + idClientsWithCard[i]);
+            console.log("\tinputsToDisable [" + i + "]: " + inputsToDisable[i].getAttribute("clientId"));
+            let check = idClientsWithCard.includes(parseInt(inputsToDisable[i].getAttribute("clientId")));
+            console.log("Czy ten klient ma kartę: " + check)
+            if (check) {
+                 console.log("disabling button!!!");
+                 inputsToDisable[i].disabled = true;
             }
         }
     }

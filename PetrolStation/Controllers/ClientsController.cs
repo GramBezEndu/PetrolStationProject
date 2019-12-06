@@ -56,7 +56,7 @@ namespace PetrolStation.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddNewClient([Bind("IdClient,Name,FirstName,Surname,NIP,Street,HouseNumber,ApartmentNumber,Postcode,Locality")] Client client)
+        public async Task<IActionResult> AddNewClient([Bind("IdClient,Name,FirstName,Surname,NIP,Street,HouseNumber,ApartmentNumber,Postcode,Locality")] Client client, bool addCard)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +72,18 @@ namespace PetrolStation.Controllers
 
                 _context.Add(client);
                 await _context.SaveChangesAsync();
+                //get added client from database
+                if(addCard)
+                {
+                    var addedClient = _context.Client.Where(x => x.IdClient == client.IdClient).FirstOrDefault();
+                    var newCard = new LoyalityCard()
+                    {
+                        IdClient = addedClient.IdClient,
+                        ActualPoints = 0
+                    };
+                    _context.Add(newCard);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(ClientList));
             }
             return View(client);

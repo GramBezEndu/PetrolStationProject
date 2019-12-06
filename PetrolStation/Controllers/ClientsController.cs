@@ -198,7 +198,7 @@ namespace PetrolStation.Controllers
         {
             var car = await _context.Car.FindAsync(idCar);
             int id = car.IdClient;
-            car.IdClient = 10; //nie ma klienta
+            car.IdClient = 1; //nie ma klienta
             _context.Update(car);
             await _context.SaveChangesAsync();
             ViewBag.Information = "Successfully removed car!";
